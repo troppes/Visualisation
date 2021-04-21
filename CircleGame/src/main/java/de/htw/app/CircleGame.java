@@ -210,16 +210,24 @@ public class CircleGame extends Application {
         }
     }
 
+    //returns the area of a shape
     float shapeArea(Shape shape) {
+        //circle area
         if (shape.getClass() == Circle.class)
             return (float) (Math.PI * Math.pow(((Circle) shape).getRadius(), 2));
+
+        //rect area
         return (float) (((Rectangle) shape).getHeight() * ((Rectangle) shape).getWidth());
     }
 
-    float calculateX(float area, float actualArea) {
-        return (float) (Math.log(area) / Math.log(actualArea));
+    //returns x for the formula
+    float calculateX(float goalArea, float actualArea) {
+        System.out.println("area: " + goalArea + " actual area: " + actualArea + " x: " + (Math.log(goalArea) / Math.log(actualArea)));
+
+        return (float) (Math.log(goalArea) / Math.log(actualArea));
     }
 
+    //changed the size of shapes according to the @modifier
     void modifySize(Shape shape, float modifier) {
         if (shape.getClass() == Circle.class)
             ((Circle) shape).setRadius(((Circle) shape).getRadius() + modifier);
@@ -247,22 +255,30 @@ public class CircleGame extends Application {
 
     void submitEstimate() {
         //Tracking data for shapes
-        float x = calculateX(shapeArea(generatedShape), shapeArea(generatedShape) * ratio);
+        float x = calculateX(shapeArea(unitShape) * ratio, shapeArea(generatedShape));
         GameShape shape = new GameShape(ratio, x, currentShape, calculateRatio());
         playedShapes.add(shape);
 
         //Tracking data for user
         totalX += x;
         shapesCount += 1;
+
+        /* old way that only start counting extra clicks after the optimal click number has been surpassed
         if (clicksForPrompt >= optimalClicksForPrompt) {
             clicksOverOptimum += clicksForPrompt - optimalClicksForPrompt;
         }
+        */
+
+        //also counts the clicks that are too few as "extra clicks"
+        //Basically measures the click distance to the optimal number of clicks
+        clicksOverOptimum += Math.abs(clicksForPrompt - optimalClicksForPrompt);
 
         //draw new game
         generateNewGame();
     }
 
     void finishGame() {
+        /*
         try {
             if (playedShapes.size() != 0) {
                 float averageX = totalX / shapesCount;
@@ -277,6 +293,7 @@ public class CircleGame extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        */
     }
 
     private void POSTRequest(GameObject go) throws IOException {
