@@ -198,16 +198,23 @@ public class CircleGame extends Application {
         //ToDo: Test this cause idk if it works or not
         //reset clicks and recalculate new click optimum
         clicksForPrompt = 0;
+        float unitArea, goalArea, correctLength;
+
         if (randomShape == 0) {   //circle
-            float goalCircleArea = (float) (Math.PI * Math.pow(ratio * unitSize, 2));
-            float correctLength = (float) Math.sqrt(goalCircleArea / Math.PI);             //this is the optimal length for radius of the circle
+            unitArea = (float) (Math.PI * Math.pow(((Circle) unitShape).getRadius(), 2));
+            goalArea = unitArea*ratio;
 
-            optimalClicksForPrompt = (int) ((correctLength - unitSize) / 10);
+            correctLength = (float) Math.sqrt(goalArea / Math.PI);             //this is the optimal length for radius of the circle
+
         } else {                   //rect
-            float correctLength = (float) Math.sqrt(ratio * 100);             //this is the optimal length for one side of the square
+            unitArea = unitSize * unitSize;
+            goalArea = unitArea*ratio;
 
-            optimalClicksForPrompt = (int) ((correctLength - unitSize) / 10);
+            correctLength = (float) Math.sqrt(goalArea);             //this is the optimal length for one side of the square
         }
+
+        optimalClicksForPrompt = (int) ((correctLength-unitSize)/ 10);                    //number of clicks on the ++ and -- buttons
+        optimalClicksForPrompt += (int) (((correctLength-unitSize)%10)/2);                 //number of clicks on the ++ and -- buttons
     }
 
     //returns the area of a shape
@@ -221,10 +228,8 @@ public class CircleGame extends Application {
     }
 
     //returns x for the formula
-    float calculateX(float goalArea, float actualArea) {
-        System.out.println("area: " + goalArea + " actual area: " + actualArea + " x: " + (Math.log(goalArea) / Math.log(actualArea)));
-
-        return (float) (Math.log(goalArea) / Math.log(actualArea));
+    float calculateX(float goalRatio, float actualRatio) {
+        return (float) (Math.log(goalRatio) / Math.log(actualRatio));
     }
 
     //changed the size of shapes according to the @modifier
@@ -243,8 +248,8 @@ public class CircleGame extends Application {
         float unitArea, generatedArea;
 
         if (currentShape == GameShape.shape.CIRCLE) {
-            unitArea = unitSize * (float) (Math.PI * Math.pow(((Circle) generatedShape).getRadius(), 2));
-            generatedArea = (float) (((Circle) generatedShape).getRadius() * (float) (Math.PI * Math.pow(((Circle) generatedShape).getRadius(), 2)));
+            unitArea = (float) (Math.PI * Math.pow(((Circle) unitShape).getRadius(), 2));
+            generatedArea = (float) (Math.PI * Math.pow(((Circle) generatedShape).getRadius(), 2));
         } else {
             unitArea = unitSize * unitSize;
             generatedArea = (float) (((Rectangle) generatedShape).getWidth() * ((Rectangle) generatedShape).getHeight());
@@ -255,8 +260,12 @@ public class CircleGame extends Application {
 
     void submitEstimate() {
         //Tracking data for shapes
-        float x = calculateX(shapeArea(unitShape) * ratio, shapeArea(generatedShape));
-        GameShape shape = new GameShape(ratio, x, currentShape, calculateRatio());
+        //float x = calculateX(shapeArea(unitShape) * ratio, shapeArea(generatedShape));
+        float estimatedRatio = calculateRatio();
+
+        float x = calculateX(ratio, estimatedRatio);
+
+        GameShape shape = new GameShape(ratio, x, currentShape, estimatedRatio);
         playedShapes.add(shape);
 
         //Tracking data for user
@@ -278,7 +287,6 @@ public class CircleGame extends Application {
     }
 
     void finishGame() {
-        /*
         try {
             if (playedShapes.size() != 0) {
                 float averageX = totalX / shapesCount;
@@ -293,7 +301,6 @@ public class CircleGame extends Application {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        */
     }
 
     private void POSTRequest(GameObject go) throws IOException {
