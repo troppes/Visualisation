@@ -255,9 +255,8 @@ public class CircleGame extends Application {
 
     //returns x for the formula
     float calculateX(float goalRatio, float actualRatio) {
-        float x = (float) (Math.log(goalRatio) / Math.log(actualRatio));
+        return (float) (Math.log(goalRatio) / Math.log(actualRatio));
         //return Float.isInfinite(x) ? 0 : x;
-        return x;
     }
 
     //changed the size of shapes according to the @modifier
