@@ -256,8 +256,8 @@ public class CircleGame extends Application {
     //returns x for the formula
     float calculateX(float goalRatio, float actualRatio) {
         float x = (float) (Math.log(goalRatio) / Math.log(actualRatio));
-        return Float.isInfinite(x) ? 0 : x;
-        //return x;
+        //return Float.isInfinite(x) ? 0 : x;
+        return x;
     }
 
     //changed the size of shapes according to the @modifier
@@ -291,20 +291,20 @@ public class CircleGame extends Application {
         //float x = calculateX(shapeArea(unitShape) * ratio, shapeArea(generatedShape));
         float estimatedRatio = calculateRatio();
 
-        float x = calculateX(ratio, estimatedRatio);
-        System.out.println(x);
-        //Make sure its not infinity, if so set to 0
+        if (estimatedRatio!=1) {
+            float x = calculateX(ratio, estimatedRatio);
+            //Make sure its not infinity, if so set to 0
 
-        GameShape shape = new GameShape(ratio, x, currentShape, estimatedRatio);
-        playedShapes.add(shape);
+            GameShape shape = new GameShape(ratio, x, currentShape, estimatedRatio);
+            playedShapes.add(shape);
 
-        //Add Finish Button
-        if (playedShapes.size() == 3) {
-            finishButton.setDisable(false);
-        }
+            //Add Finish Button
+            if (playedShapes.size() == 3) {
+                finishButton.setDisable(false);
+            }
 
-        //Tracking data for user
-        totalX += x;
+            //Tracking data for user
+            totalX += x;
 
         /* old way that only start counting extra clicks after the optimal click number has been surpassed
         if (clicksForPrompt >= optimalClicksForPrompt) {
@@ -312,10 +312,10 @@ public class CircleGame extends Application {
         }
         */
 
-        //also counts the clicks that are too few as "extra clicks"
-        //Basically measures the click distance to the optimal number of clicks
-        clicksOverOptimum += Math.abs(clicksForPrompt - optimalClicksForPrompt);
-
+            //also counts the clicks that are too few as "extra clicks"
+            //Basically measures the click distance to the optimal number of clicks
+            clicksOverOptimum += Math.abs(clicksForPrompt - optimalClicksForPrompt);
+        }
         //draw new game
         generateNewGame();
     }
