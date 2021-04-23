@@ -50,7 +50,6 @@ public class CircleGame extends Application {
     Stage primaryStage;
     //tracking data
     ArrayList<GameShape> playedShapes = new ArrayList<>();
-    int shapesCount = 0;
     float totalX = 0;
     int clicksOverOptimum = 0, clicksForPrompt = 0, optimalClicksForPrompt = 0;
 
@@ -234,8 +233,8 @@ public class CircleGame extends Application {
             correctLength = (float) Math.sqrt(goalArea);             //this is the optimal length for one side of the square
         }
 
-        optimalClicksForPrompt = (int) ((correctLength-unitSize)/ 10);                    //number of clicks on the ++ and -- buttons
-        optimalClicksForPrompt += (int) (((correctLength-unitSize)%10)/2);                 //number of clicks on the ++ and -- buttons
+        optimalClicksForPrompt = Math.abs(((int)((correctLength-unitSize)/ 10)*5));                 //number of clicks on the ++ and -- buttons
+        optimalClicksForPrompt += Math.abs((int)(((correctLength-unitSize)%10)/2));                 //number of clicks on the ++ and -- buttons
     }
 
     //returns x for the formula
@@ -252,7 +251,7 @@ public class CircleGame extends Application {
             ((Rectangle) shape).setWidth(((Rectangle) shape).getWidth() + modifier);
         }
 
-        clicksForPrompt++;
+        clicksForPrompt+=Math.abs(modifier/2);
     }
 
     float calculateRatio() {
@@ -286,7 +285,6 @@ public class CircleGame extends Application {
 
         //Tracking data for user
         totalX += x;
-        shapesCount += 1;
 
         /* old way that only start counting extra clicks after the optimal click number has been surpassed
         if (clicksForPrompt >= optimalClicksForPrompt) {
@@ -305,7 +303,7 @@ public class CircleGame extends Application {
     void finishGame() {
         try {
             if (playedShapes.size() != 0) {
-                float averageX = totalX / shapesCount;
+                float averageX = totalX / playedShapes.size();
 
                 GameShape[] gameShapes = new GameShape[playedShapes.size()];
                 gameShapes = playedShapes.toArray(gameShapes);
