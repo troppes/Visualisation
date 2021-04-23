@@ -111,8 +111,8 @@ public class CircleGame extends Application {
                 , "Controls:"
                 , "w or Button + = Increase shape size"
                 , "s or Button - = Decrease shape size"
-                , "Button ++ = Increase shape size * 5"
-                , "Button -- = Decrease shape size * 5 \n"
+                , "e or Button ++ = Increase shape size * 5"
+                , "d or Button -- = Decrease shape size * 5 \n"
                 , "You can play as many shapes as you want, but after you have played three shapes, you can press the FINISH button to see your results."
         ));
         welcomeMessage.setStyle("-fx-font: 14 monospaced;");
@@ -137,21 +137,31 @@ public class CircleGame extends Application {
         //+ W up
         scene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
             if (key.getCode() == KeyCode.W) {
-                modifySize(generatedShape, 10);
+                modifySize(generatedShape, 2);
             }
         });
         //- S down
         scene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
-            if (key.getCode() == KeyCode.S) {
-                modifySize(generatedShape, -10);
+            switch (key.getCode()) {
+                case W: {
+                    modifySize(generatedShape, 2);
+                    break;
+                }
+                case S: {
+                    modifySize(generatedShape, -2);
+                    break;
+                }
+                case E: {
+                    modifySize(generatedShape, 10);
+                    break;
+                }
+                case D: {
+                    modifySize(generatedShape, -10);
+                    break;
+                }
             }
         });
-        //Enter
-        scene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
-            if (key.getCode() == KeyCode.ENTER) {
-                submitEstimate();
-            }
-        });
+
         this.primaryStage = primaryStage;
 
         primaryStage.setScene(scene);
@@ -239,7 +249,8 @@ public class CircleGame extends Application {
 
     //returns x for the formula
     float calculateX(float goalRatio, float actualRatio) {
-        return (float) (Math.log(goalRatio) / Math.log(actualRatio));
+        float x = (float) (Math.log(goalRatio) / Math.log(actualRatio));
+        return Float.isInfinite(x) ? 0 : x;
     }
 
     //changed the size of shapes according to the @modifier
@@ -274,6 +285,7 @@ public class CircleGame extends Application {
         float estimatedRatio = calculateRatio();
 
         float x = calculateX(ratio, estimatedRatio);
+        //Make sure its not infinity, if so set to 0
 
         GameShape shape = new GameShape(ratio, x, currentShape, estimatedRatio);
         playedShapes.add(shape);
@@ -330,8 +342,6 @@ public class CircleGame extends Application {
                 , "Your total X was " + Math.round((totalX / playedShapes.size()) * 100F) / 100F + "."
                 , "X is calculated by: (perceived size ratio) = (actual ratio of area contents)^x."
                 , "That means the closer your are to 1 the better you are. \n"
-                , "Your clicks were " + clicksOverOptimum + " away from the optimum."
-                , "The optimum is calculated by measuring the least amount of clicks needed and comparing your clicks to it."
         ));
         welcomeMessage.setStyle("-fx-font: 16 arial;");
 
@@ -365,6 +375,7 @@ public class CircleGame extends Application {
             // catch various errors
             e.printStackTrace();
         }
+
         URL obj = new URL("https://cms.reitz.dev/items/shape_game/");
         HttpURLConnection postConnection = (HttpURLConnection) obj.openConnection();
         postConnection.setRequestMethod("POST");
