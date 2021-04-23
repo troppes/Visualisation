@@ -8,8 +8,10 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
@@ -17,11 +19,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -42,6 +46,8 @@ public class CircleGame extends Application {
     GameShape.shape currentShape;
     String name = "Player";
     HBox circlesBox;
+    Button finishButton;
+    Stage primaryStage;
     //tracking data
     ArrayList<GameShape> playedShapes = new ArrayList<>();
     int shapesCount = 0;
@@ -60,6 +66,9 @@ public class CircleGame extends Application {
         minusButton = new Button("-");
         bigMinusButton = new Button("--");
         Button submitButton = new Button("Submit");
+        finishButton = new Button("Finish");
+        finishButton.setDisable(true);
+        finishButton.setOnAction(e -> finishGame());
 
         HBox buttonBox = new HBox();
         buttonBox.setSpacing(10);
@@ -68,12 +77,9 @@ public class CircleGame extends Application {
         buttonBox.getChildren().add(minusButton);
         buttonBox.getChildren().add(bigMinusButton);
         buttonBox.getChildren().add(submitButton);
+        buttonBox.getChildren().add(finishButton);
         buttonBox.setAlignment(Pos.CENTER);
         root.setBottom(buttonBox);
-
-        Button exitButton = new Button("Exit");
-        root.setRight(exitButton);
-        exitButton.setOnAction(actionEvent -> System.exit(0));
 
         heading = new Label("Ratio");
         heading.setFont(new Font("Arial", 30));
@@ -82,21 +88,40 @@ public class CircleGame extends Application {
         headingBox.setAlignment(Pos.CENTER);
         root.setTop(headingBox);
 
-        //circles hbox init
+        //circles Height-Box init
         circlesBox = new HBox();
         circlesBox.setSpacing(10);
 
         generateNewGame();
 
         TextInputDialog dialog = new TextInputDialog("walter");
-        dialog.setTitle("Welcome to this experience!");
+        dialog.setTitle("Enter Name");
+        dialog.setHeaderText("Welcome");
         dialog.setContentText("Please enter your name:");
 
         // Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(s -> name = s);
 
-        //circles hbox elements
+        Text welcomeMessage = new Text(String.join("\n"
+                , "Welcome " + name + ","
+                , "thank you for playing our Game! \n"
+                , "Controls:"
+                , "w or Button + = Increase shape size"
+                , "s or Button - = Decrease shape size"
+                , "Button ++ = Increase shape size * 5"
+                , "Button -- = Decrease shape size * 5 \n"
+                , "You can play as many shapes as you want, but after you have played three shapes, you can press the FINISH button to see your results."
+        ));
+        welcomeMessage.setStyle("-fx-font: 14 monospaced;");
+
+        Alert instructions = new Alert(Alert.AlertType.INFORMATION);
+        instructions.getDialogPane().setContent(welcomeMessage);
+        instructions.setTitle("Instructions");
+        instructions.setHeaderText("Instructions");
+        instructions.showAndWait();
+
+        //circles Height-Box elements
         circlesBox.setAlignment(Pos.CENTER);
 
         root.setCenter(circlesBox);
@@ -125,17 +150,12 @@ public class CircleGame extends Application {
                 submitEstimate();
             }
         });
+        this.primaryStage = primaryStage;
 
         primaryStage.setScene(scene);
-        primaryStage.setTitle("X-Finder");
+        primaryStage.setTitle("X-Factor: RELOADED");
         primaryStage.show();
 
-    }
-
-    @Override
-    public void stop() throws Exception {
-        finishGame();
-        super.stop();
     }
 
     void generateNewGame() {
@@ -156,7 +176,6 @@ public class CircleGame extends Application {
 
         heading.setText("Ratio 1:" + ratio);
 
-        //Todo: Set Radius to already generated average x IF enough shapes have been processed
         if (currentShape == GameShape.shape.CIRCLE) {
             if (unitShape != null) {
                 circlesBox.getChildren().remove(unitShape);
@@ -195,36 +214,25 @@ public class CircleGame extends Application {
         //BigMinusButton Listener
         bigMinusButton.setOnAction(actionEvent -> modifySize(generatedShape, -10));
 
-        //ToDo: Test this cause idk if it works or not
         //reset clicks and recalculate new click optimum
         clicksForPrompt = 0;
         float unitArea, goalArea, correctLength;
 
         if (randomShape == 0) {   //circle
             unitArea = (float) (Math.PI * Math.pow(((Circle) unitShape).getRadius(), 2));
-            goalArea = unitArea*ratio;
+            goalArea = unitArea * ratio;
 
             correctLength = (float) Math.sqrt(goalArea / Math.PI);             //this is the optimal length for radius of the circle
 
         } else {                   //rect
             unitArea = unitSize * unitSize;
-            goalArea = unitArea*ratio;
+            goalArea = unitArea * ratio;
 
             correctLength = (float) Math.sqrt(goalArea);             //this is the optimal length for one side of the square
         }
 
         optimalClicksForPrompt = (int) ((correctLength-unitSize)/ 10);                    //number of clicks on the ++ and -- buttons
         optimalClicksForPrompt += (int) (((correctLength-unitSize)%10)/2);                 //number of clicks on the ++ and -- buttons
-    }
-
-    //returns the area of a shape
-    float shapeArea(Shape shape) {
-        //circle area
-        if (shape.getClass() == Circle.class)
-            return (float) (Math.PI * Math.pow(((Circle) shape).getRadius(), 2));
-
-        //rect area
-        return (float) (((Rectangle) shape).getHeight() * ((Rectangle) shape).getWidth());
     }
 
     //returns x for the formula
@@ -268,6 +276,11 @@ public class CircleGame extends Application {
         GameShape shape = new GameShape(ratio, x, currentShape, estimatedRatio);
         playedShapes.add(shape);
 
+        //Add Finish Button
+        if (playedShapes.size() == 3) {
+            finishButton.setDisable(false);
+        }
+
         //Tracking data for user
         totalX += x;
         shapesCount += 1;
@@ -297,10 +310,47 @@ public class CircleGame extends Application {
                 GameObject go = new GameObject(name, averageX, clicksOverOptimum, gameShapes);
                 POSTRequest(go);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }
+        generateResultScreen();
+    }
+
+    void generateResultScreen() {
+        BorderPane results = new BorderPane();
+        results.setPrefSize(1280, 720);
+
+        VBox centerContent = new VBox();
+        centerContent.setAlignment(Pos.CENTER);
+
+        Text welcomeMessage = new Text(String.join("\n"
+                , "Hello " + name + ","
+                , "here are your Results: \n"
+                , "Your total X was " + Math.round((totalX / playedShapes.size()) * 100F) / 100F + "."
+                , "X is calculated by: (perceived size ratio) = (actual ratio of area contents)^x."
+                , "That means the closer your are to 1 the better you are. \n"
+                , "Your clicks were " + clicksOverOptimum + " away from the optimum."
+                , "The optimum is calculated by measuring the least amount of clicks needed and comparing your clicks to it."
+        ));
+        welcomeMessage.setStyle("-fx-font: 16 arial;");
+
+        centerContent.getChildren().add(welcomeMessage);
+        results.setCenter(centerContent);
+
+        HBox exitButtonBox = new HBox();
+        Button exitButton = new Button("Close");
+        exitButton.setOnAction(e -> System.exit(0));
+        exitButton.setPadding(new Insets(10,10,10,10));
+        exitButton.setStyle("-fx-font: 16 arial;");
+        exitButtonBox.getChildren().add(exitButton);
+        exitButtonBox.setAlignment(Pos.CENTER);
+        exitButtonBox.setPadding(new Insets(20,20,20,20));
+        results.setBottom(exitButtonBox);
+
+        Scene scene = new Scene(results);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+
     }
 
     private void POSTRequest(GameObject go) throws IOException {
