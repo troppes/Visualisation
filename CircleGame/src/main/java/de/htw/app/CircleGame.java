@@ -179,6 +179,12 @@ public class CircleGame extends Application {
         float randomRatio = .1f + random.nextFloat() * (5 - .1f);   //min + r.nextFloat() * (max - min);
         randomRatio = ((int) (randomRatio * 10)) / 10f;    //Shorten float to first decimal place
 
+        //recalculate random ratio, if it's equal to one, as this case doesn't give any proper data
+        while (randomRatio == 1){
+            randomRatio = .1f + random.nextFloat() * (5 - .1f);   //min + r.nextFloat() * (max - min);
+            randomRatio = ((int) (randomRatio * 10)) / 10f;    //Shorten float to first decimal place
+        }
+
         if (randomShape == 0)
             currentShape = GameShape.shape.CIRCLE;
         else
@@ -251,6 +257,7 @@ public class CircleGame extends Application {
     float calculateX(float goalRatio, float actualRatio) {
         float x = (float) (Math.log(goalRatio) / Math.log(actualRatio));
         return Float.isInfinite(x) ? 0 : x;
+        //return x;
     }
 
     //changed the size of shapes according to the @modifier
@@ -285,6 +292,7 @@ public class CircleGame extends Application {
         float estimatedRatio = calculateRatio();
 
         float x = calculateX(ratio, estimatedRatio);
+        System.out.println(x);
         //Make sure its not infinity, if so set to 0
 
         GameShape shape = new GameShape(ratio, x, currentShape, estimatedRatio);
