@@ -102,6 +102,9 @@ public class CircleGame extends Application {
         // Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();
         result.ifPresent(s -> name = s);
+        if(result.isEmpty()){
+            System.exit(0);
+        }
 
         Text welcomeMessage = new Text(String.join("\n"
                 , "Welcome " + name + ","
