@@ -9,10 +9,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -322,19 +319,19 @@ public class CircleGame extends Application {
     }
 
     void finishGame() {
-//        try {
-//            if (playedShapes.size() != 0) {
-//                float averageX = totalX / playedShapes.size();
-//
-//                GameShape[] gameShapes = new GameShape[playedShapes.size()];
-//                gameShapes = playedShapes.toArray(gameShapes);
-//
-//                GameObject go = new GameObject(name, averageX, clicksOverOptimum, gameShapes);
-//                POSTRequest(go);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
+        //try {
+        //    if (playedShapes.size() != 0) {
+        //        float averageX = totalX / playedShapes.size();
+
+        //        GameShape[] gameShapes = new GameShape[playedShapes.size()];
+        //        gameShapes = playedShapes.toArray(gameShapes);
+
+        //       GameObject go = new GameObject(name, averageX, clicksOverOptimum, gameShapes);
+        //        POSTRequest(go);
+        //    }
+        //} catch (IOException e) {
+        //    e.printStackTrace();
+        //}
         generateResultScreen();
     }
 
@@ -369,7 +366,8 @@ public class CircleGame extends Application {
         exitButtonBox.setPadding(new Insets(20,20,20,20));
         results.setBottom(exitButtonBox);
 
-        results.setTop(generateAverageXBarCharts());
+        results.setTop(generateAverageXBarChart());
+        results.setLeft(generateAverageClicksBarChart());
 
         Scene scene = new Scene(results);
         primaryStage.setScene(scene);
@@ -377,7 +375,7 @@ public class CircleGame extends Application {
 
     }
 
-    BarChart<String, Number> generateAverageXBarCharts(){
+    BarChart<String, Number> generateAverageXBarChart(){
         final CategoryAxis xAxis = new CategoryAxis();
         final NumberAxis yAxis = new NumberAxis();
         final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
@@ -391,9 +389,6 @@ public class CircleGame extends Application {
 
         List<GameShape> squareShapes = getSquares();
         List<GameShape> circleShapes = getCircles();
-
-        System.out.println(circleShapes.get(0));
-        System.out.println(squareShapes.get(0));
 
         float averageXTotal = 0, averageXCircles = 0, averageXSquares = 0;
         float averageOverestimatedX = 0, averageOverestimatedXCircles = 0, averageOverestimatedXSquares = 0;
@@ -497,6 +492,37 @@ public class CircleGame extends Application {
         series5.getData().add(new XYChart.Data<String, Number>("Squares", averageXSquaresPlayer));
 
         barChart.getData().addAll(series2, series1, series4, series3, series5);
+
+        return barChart;
+
+    }
+
+    BarChart<String, Number> generateAverageClicksBarChart(){
+        final CategoryAxis xAxis = new CategoryAxis();
+        final NumberAxis yAxis = new NumberAxis();
+        final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
+        barChart.setTitle("Unoptimal Clicks");
+        xAxis.setLabel("Group");
+        yAxis.setLabel("Clicks");
+
+        barChart.setMaxWidth(200);
+        barChart.setMinHeight(400);
+        //barChart.setCategoryGap(50);
+
+        List<GameObject> gameObjects = getGameObjects();
+
+        int averageClicksOverOptimum = 0;
+        for (GameObject go : gameObjects) {
+            averageClicksOverOptimum += go.getClicks();
+        }
+        averageClicksOverOptimum/=gameObjects.size();
+
+        XYChart.Series series1 = new XYChart.Series<String, Number>();
+        series1.setName("Unoptimal Clicks");
+        series1.getData().add(new XYChart.Data<String, Number>("Total Average", averageClicksOverOptimum));
+        series1.getData().add(new XYChart.Data<String, Number>("Your Average", clicksOverOptimum));
+
+        barChart.getData().addAll(series1);
 
         return barChart;
 
