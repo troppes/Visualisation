@@ -1,10 +1,11 @@
 package de.htw.app;
 
-import java.util.ArrayList;
-import java.util.Optional;
-import java.util.Random;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
@@ -320,23 +321,24 @@ public class CircleGame extends Application {
     }
 
     void finishGame() {
-        try {
-            if (playedShapes.size() != 0) {
-                float averageX = totalX / playedShapes.size();
-
-                GameShape[] gameShapes = new GameShape[playedShapes.size()];
-                gameShapes = playedShapes.toArray(gameShapes);
-
-                GameObject go = new GameObject(name, averageX, clicksOverOptimum, gameShapes);
-                POSTRequest(go);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            if (playedShapes.size() != 0) {
+//                float averageX = totalX / playedShapes.size();
+//
+//                GameShape[] gameShapes = new GameShape[playedShapes.size()];
+//                gameShapes = playedShapes.toArray(gameShapes);
+//
+//                GameObject go = new GameObject(name, averageX, clicksOverOptimum, gameShapes);
+//                POSTRequest(go);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         generateResultScreen();
     }
 
     void generateResultScreen() {
+
         BorderPane results = new BorderPane();
         results.setPrefSize(1280, 720);
 
@@ -364,6 +366,8 @@ public class CircleGame extends Application {
         exitButtonBox.setAlignment(Pos.CENTER);
         exitButtonBox.setPadding(new Insets(20,20,20,20));
         results.setBottom(exitButtonBox);
+
+        results.setTop(generateAverageXBarCharts());
 
         Scene scene = new Scene(results);
         primaryStage.setScene(scene);
@@ -399,6 +403,66 @@ public class CircleGame extends Application {
             throw new IOException("Posting the data did not work!");
         }
     }
+
+    private List<GameObject> getGameObjects() {
+        String response = getRequest("https://cms.reitz.dev/items/shape_game/?fields=user,average_x,clicks");
+        try {
+            return Arrays.asList(new ObjectMapper().readValue(response, GameObject[].class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    private List<GameShape> getSquares() {
+        String response = getRequest("https://cms.reitz.dev/items/shape_ratio/?filter[shape][_eq]=SQUARE&fields=x,ratio,shape,estimated_ratio");
+        try {
+            return Arrays.asList(new ObjectMapper().readValue(response, GameShape[].class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    private List<GameShape> getCircles() {
+        String response = getRequest("https://cms.reitz.dev/items/shape_ratio/?filter[shape][_eq]=CIRCLE&fields=x,ratio,shape,estimated_ratio");
+        try {
+            return Arrays.asList(new ObjectMapper().readValue(response, GameShape[].class));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    private String getRequest(String url) {
+        try {
+            URL obj = new URL(url);
+            HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Content-Type", "application/json");
+            int responseCode = con.getResponseCode();
+            System.out.println("GET Response Code :: " + responseCode);
+            if (responseCode == HttpURLConnection.HTTP_OK) { // success
+                BufferedReader in = new BufferedReader(new InputStreamReader(
+                        con.getInputStream()));
+                String inputLine;
+
+                StringBuilder response = new StringBuilder();
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                // Slice since cms gives us a wrapper
+                return response.substring(0, response.length()-1).substring(8);
+            } else {
+                throw new IOException("Get Request for the GameObjects failed!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     public static void main(String[] args) {
         launch(args);

@@ -1,10 +1,22 @@
 package de.htw.app;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class GameObject {
     private String user;
     private float average_x;
+    @JsonIgnore
     private GameShape[] shapes_played;
     private int clicks;
+
+    public GameObject(){}
+
+    public GameObject(String user, float average_x, int clicks){
+        this.user = user;
+        this.average_x = average_x;
+        this.clicks = clicks;
+        this.shapes_played = null;
+    }
 
     public GameObject(String user, float average_x, int clicks, GameShape[] shapes_played) {
         this.user = user;
