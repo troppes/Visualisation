@@ -1,11 +1,8 @@
 package de.htw.app;
 
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.util.*;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
@@ -383,12 +380,14 @@ public class CircleGame extends Application {
     BarChart<String, Number> generateAverageXBarCharts(){
         final CategoryAxis xAxis = new CategoryAxis();
         final NumberAxis yAxis = new NumberAxis();
-        final BarChart<String,Number> barChart = new BarChart<String,Number>(xAxis,yAxis);
+        final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
         barChart.setTitle("Average X Summary");
         xAxis.setLabel("Shape");
         yAxis.setLabel("Value");
-        barChart.setBarGap(0);
-        barChart.setCategoryGap(25);
+
+        barChart.setMaxWidth(500);
+        barChart.setBarGap(-5);
+        barChart.setCategoryGap(50);
 
         List<GameShape> squareShapes = getSquares();
         List<GameShape> circleShapes = getCircles();
@@ -399,7 +398,7 @@ public class CircleGame extends Application {
         float averageXTotal = 0, averageXCircles = 0, averageXSquares = 0;
         float averageOverestimatedX = 0, averageOverestimatedXCircles = 0, averageOverestimatedXSquares = 0;
         int overestimatedCirclesCounter = 0, overestimatedSquaresCounter = 0;
-        float averageUnderestimatedXTotal = 0, averageUnderestimatedXCircles = 0, averageUnderestimatedXSquares = 0;
+        float averageUnderestimatedX = 0, averageUnderestimatedXCircles = 0, averageUnderestimatedXSquares = 0;
         int underestimatedCirclesCounter = 0, underestimatedSquaresCounter = 0;
 
         for(GameShape shape : squareShapes){
@@ -413,7 +412,7 @@ public class CircleGame extends Application {
                 overestimatedSquaresCounter++;
             }
             if(shape.getX() < 1){
-                averageUnderestimatedXTotal += shape.getX();
+                averageUnderestimatedX += shape.getX();
                 averageUnderestimatedXSquares += shape.getX();
 
                 underestimatedSquaresCounter++;
@@ -434,20 +433,20 @@ public class CircleGame extends Application {
                 overestimatedCirclesCounter++;
             }
             if(shape.getX() < 1){
-                averageUnderestimatedXTotal += shape.getX();
+                averageUnderestimatedX += shape.getX();
                 averageUnderestimatedXCircles += shape.getX();
 
                 underestimatedCirclesCounter++;
             }
         }
-        averageXCircles /= squareShapes.size();
+        averageXCircles /= circleShapes.size();
         averageXTotal /= squareShapes.size()+circleShapes.size();
 
         averageOverestimatedXCircles /= overestimatedCirclesCounter;
-        averageOverestimatedX /= overestimatedCirclesCounter+underestimatedCirclesCounter;
+        averageOverestimatedX /= overestimatedCirclesCounter+overestimatedSquaresCounter;
 
         averageUnderestimatedXCircles /= underestimatedCirclesCounter;
-        averageUnderestimatedXTotal /= overestimatedCirclesCounter+underestimatedCirclesCounter;
+        averageUnderestimatedX /= underestimatedCirclesCounter+underestimatedSquaresCounter;
 
 
         float averageXPlayer = totalX / playedShapes.size();
@@ -467,37 +466,37 @@ public class CircleGame extends Application {
         averageXSquaresPlayer /= averageXSquaresPlayerCounter;
         averageXCirclesPlayer /= averageXCirclesPlayerCounter;
 
-        XYChart.Series series1 = new XYChart.Series();
+        XYChart.Series series1 = new XYChart.Series<String, Number>();
         series1.setName("Average X");
-        series1.getData().add(new XYChart.Data("All Shapes", averageXTotal));
-        series1.getData().add(new XYChart.Data("Circles", averageXCircles));
-        series1.getData().add(new XYChart.Data("Squares", averageXSquares));
+        series1.getData().add(new XYChart.Data<String, Number>("All Shapes", averageXTotal));
+        series1.getData().add(new XYChart.Data<String, Number>("Circles", averageXCircles));
+        series1.getData().add(new XYChart.Data<String, Number>("Squares", averageXSquares));
 
-        XYChart.Series series2 = new XYChart.Series();
+        XYChart.Series series2 = new XYChart.Series<String, Number>();
         series2.setName("Average overestimated X");
-        series2.getData().add(new XYChart.Data("All Shapes", averageOverestimatedX));
-        series2.getData().add(new XYChart.Data("Circles", averageOverestimatedXCircles));
-        series2.getData().add(new XYChart.Data("Squares", averageOverestimatedXSquares));
+        series2.getData().add(new XYChart.Data<String, Number>("All Shapes", averageOverestimatedX));
+        series2.getData().add(new XYChart.Data<String, Number>("Circles", averageOverestimatedXCircles));
+        series2.getData().add(new XYChart.Data<String, Number>("Squares", averageOverestimatedXSquares));
 
-        XYChart.Series series3 = new XYChart.Series();
+        XYChart.Series series3 = new XYChart.Series<String, Number>();
         series3.setName("Optimal X");
-        series3.getData().add(new XYChart.Data("All Shapes", 1));
-        series3.getData().add(new XYChart.Data("Circles", 1));
-        series3.getData().add(new XYChart.Data("Squares", 1));
+        series3.getData().add(new XYChart.Data<String, Number>("All Shapes", 1));
+        series3.getData().add(new XYChart.Data<String, Number>("Circles", 1));
+        series3.getData().add(new XYChart.Data<String, Number>("Squares", 1));
 
-        XYChart.Series series4 = new XYChart.Series();
+        XYChart.Series series4 = new XYChart.Series<String, Number>();
         series4.setName("Average underestimated X");
-        series4.getData().add(new XYChart.Data("All Shapes", averageUnderestimatedXTotal));
-        series4.getData().add(new XYChart.Data("Circles", averageUnderestimatedXCircles));
-        series4.getData().add(new XYChart.Data("Squares", averageUnderestimatedXSquares));
+        series4.getData().add(new XYChart.Data<String, Number>("All Shapes", averageUnderestimatedX));
+        series4.getData().add(new XYChart.Data<String, Number>("Circles", averageUnderestimatedXCircles));
+        series4.getData().add(new XYChart.Data<String, Number>("Squares", averageUnderestimatedXSquares));
 
-        XYChart.Series series5 = new XYChart.Series();
+        XYChart.Series series5 = new XYChart.Series<String, Number>();
         series5.setName("Your X");
-        series5.getData().add(new XYChart.Data("All Shapes", averageXPlayer));
-        series5.getData().add(new XYChart.Data("Circles", averageXCirclesPlayer));
-        series5.getData().add(new XYChart.Data("Squares", averageXSquaresPlayer));
+        series5.getData().add(new XYChart.Data<String, Number>("All Shapes", averageXPlayer));
+        series5.getData().add(new XYChart.Data<String, Number>("Circles", averageXCirclesPlayer));
+        series5.getData().add(new XYChart.Data<String, Number>("Squares", averageXSquaresPlayer));
 
-        barChart.getData().addAll(series1, series2, series3, series4, series5);
+        barChart.getData().addAll(series2, series1, series4, series3, series5);
 
         return barChart;
 
