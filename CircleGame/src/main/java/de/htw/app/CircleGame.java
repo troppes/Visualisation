@@ -6,14 +6,12 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Application;
-import javafx.geometry.Insets;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -43,7 +41,6 @@ public class CircleGame extends Application {
     Shape generatedShape;
     float ratio;
     GameShape.shape currentShape;
-    String name = "Player";
     HBox circlesBox;
     Button finishButton;
     Stage primaryStage;
@@ -52,11 +49,17 @@ public class CircleGame extends Application {
     float totalX = 0;
     int clicksOverOptimum = 0, clicksForPrompt = 0, optimalClicksForPrompt = 0;
 
+    GameObject currentPlayer;
+
     @Override
     public void start(Stage primaryStage) {
 
         BorderPane root = new BorderPane();
         root.setPrefSize(1280, 720);
+
+        currentPlayer = new GameObject();
+        currentPlayer.setUser("Player");
+        currentPlayer.setId(-1);
 
         //UI
         bigPlusButton = new Button("++");
@@ -99,13 +102,13 @@ public class CircleGame extends Application {
 
         // Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();
-        result.ifPresent(s -> name = s);
+        result.ifPresent(s -> currentPlayer.setUser(s));
         if(result.isEmpty()){
             System.exit(0);
         }
 
         Text welcomeMessage = new Text(String.join("\n"
-                , "Welcome " + name + ","
+                , "Welcome " + currentPlayer.getUser() + ","
                 , "thank you for playing our Game! \n"
                 , "Controls:"
                 , "w or Button + = Increase shape size"
@@ -319,24 +322,30 @@ public class CircleGame extends Application {
     }
 
     void finishGame() {
-        //try {
-        //    if (playedShapes.size() != 0) {
-        //        float averageX = totalX / playedShapes.size();
+        try {
+            if (playedShapes.size() != 0) {
+                float averageX = totalX / playedShapes.size();
 
-        //        GameShape[] gameShapes = new GameShape[playedShapes.size()];
-        //        gameShapes = playedShapes.toArray(gameShapes);
+                GameShape[] gameShapes = new GameShape[playedShapes.size()];
+                gameShapes = playedShapes.toArray(gameShapes);
 
-        //       GameObject go = new GameObject(name, averageX, clicksOverOptimum, gameShapes);
-        //        POSTRequest(go);
-        //    }
-        //} catch (IOException e) {
-        //    e.printStackTrace();
-        //}
+                currentPlayer.setAverage_x(averageX);
+                currentPlayer.setShapes_played(gameShapes);
+                currentPlayer.setClicks(clicksOverOptimum);
+                POSTRequest(currentPlayer);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         generateResultScreen();
     }
 
     //ToDo: Exchange this with our visualization
     void generateResultScreen() {
+
+        List<GameShape> squareShapes = getSquares();
+        List<GameShape> circleShapes = getCircles();
+        List<GameObject> gameObjects = getGameObjects();
 
         BorderPane results = new BorderPane();
         results.setPrefSize(1280, 720);
@@ -345,8 +354,7 @@ public class CircleGame extends Application {
         centerContent.setAlignment(Pos.CENTER);
 
         Text welcomeMessage = new Text(String.join("\n"
-                , "Hello " + name + ","
-                , "here are your Results: \n"
+                , "Hello " + currentPlayer.getUser() + ","
                 , "Your total X was " + Math.round((totalX / playedShapes.size()) * 100F) / 100F + "."
                 , "X is calculated by: (perceived size ratio) = (actual ratio of area contents)^x."
                 , "That means the closer your are to 1 the better you are. \n"
@@ -356,18 +364,11 @@ public class CircleGame extends Application {
         centerContent.getChildren().add(welcomeMessage);
         results.setCenter(centerContent);
 
-        HBox exitButtonBox = new HBox();
-        Button exitButton = new Button("Close");
-        exitButton.setOnAction(e -> System.exit(0));
-        exitButton.setPadding(new Insets(10,10,10,10));
-        exitButton.setStyle("-fx-font: 16 arial;");
-        exitButtonBox.getChildren().add(exitButton);
-        exitButtonBox.setAlignment(Pos.CENTER);
-        exitButtonBox.setPadding(new Insets(20,20,20,20));
-        results.setBottom(exitButtonBox);
+        results.setLeft(generateAverageClicksBarChart(gameObjects));
+        results.setTop(generateAverageXBarChart(squareShapes, circleShapes));
 
-        results.setTop(generateAverageXBarChart());
-        results.setLeft(generateAverageClicksBarChart());
+        results.setRight(generateHighScores(gameObjects));
+        results.setBottom(generateScatter(circleShapes, squareShapes));
 
         Scene scene = new Scene(results);
         primaryStage.setScene(scene);
@@ -375,20 +376,81 @@ public class CircleGame extends Application {
 
     }
 
-    BarChart<String, Number> generateAverageXBarChart(){
+    ScatterChart<Number, Number> generateScatter(List<GameShape> circles, List<GameShape> squares){
+
+        final NumberAxis xAxis = new NumberAxis(0, 5, .5);
+        final NumberAxis yAxis = new NumberAxis(0, 2, .2);
+        final ScatterChart<Number,Number> sc = new ScatterChart<>(xAxis, yAxis);
+        xAxis.setLabel("Ratio");
+        yAxis.setLabel("X");
+        sc.setTitle("X to Ratio");
+
+        ArrayList<XYChart.Data<Number, Number>> circleData = new ArrayList<>();
+        ArrayList<XYChart.Data<Number, Number>> squareData = new ArrayList<>();
+
+        for (GameShape circle : circles) {
+            circleData.add(new XYChart.Data<>(circle.getRatio(), circle.getX()));
+        }
+
+        for (GameShape square : squares) {
+            squareData.add(new XYChart.Data<>(square.getRatio(), square.getX()));
+        }
+
+        XYChart.Series<Number, Number> circleSeries = new XYChart.Series<>();
+        circleSeries.setName("Circles");
+        circleSeries.setData(FXCollections.observableList(circleData));
+
+
+        XYChart.Series<Number, Number> squareSeries = new XYChart.Series<>();
+        squareSeries.setName("Squares");
+        squareSeries.setData(FXCollections.observableList(squareData));
+
+        sc.getData().add(circleSeries);
+        sc.getData().add(squareSeries);
+
+        return sc;
+    }
+
+    TableView<GameObject> generateHighScores(List<GameObject> gameObjects) {
+
+        gameObjects.sort((o1, o2) -> {
+            float d1 = Math.abs(o1.getAverage_x() - 1);
+            float d2 = Math.abs(o2.getAverage_x() - 1);
+            return Float.compare(d1, d2);
+        });
+
+        TableView<GameObject> tableView = new TableView<>();
+
+        TableColumn<GameObject, String> column1 = new TableColumn<>("Name");
+        column1.setCellValueFactory(new PropertyValueFactory<>("user"));
+
+
+        TableColumn<GameObject, String> column2 = new TableColumn<>("Score");
+        column2.setCellValueFactory(new PropertyValueFactory<>("average_x"));
+
+        tableView.requestFocus();
+        // todo fix focus
+        tableView.getSelectionModel().select(gameObjects.indexOf(currentPlayer));
+        tableView.scrollTo(gameObjects.indexOf(currentPlayer));
+
+        tableView.getColumns().add(column1);
+        tableView.getColumns().add(column2);
+
+        tableView.setItems(FXCollections.observableList(gameObjects));
+
+        return tableView;
+    }
+
+    BarChart<String, Number> generateAverageXBarChart(List<GameShape> squareShapes, List<GameShape> circleShapes){
         final CategoryAxis xAxis = new CategoryAxis();
         final NumberAxis yAxis = new NumberAxis();
         final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
         barChart.setTitle("Average X Summary");
-        xAxis.setLabel("Shape");
-        yAxis.setLabel("Value");
 
-        barChart.setMaxWidth(500);
-        barChart.setBarGap(-5);
+        barChart.setMaxHeight(300);
         barChart.setCategoryGap(50);
 
-        List<GameShape> squareShapes = getSquares();
-        List<GameShape> circleShapes = getCircles();
+
 
         float averageXTotal = 0, averageXCircles = 0, averageXSquares = 0;
         float averageOverestimatedX = 0, averageOverestimatedXCircles = 0, averageOverestimatedXSquares = 0;
@@ -461,35 +523,35 @@ public class CircleGame extends Application {
         averageXSquaresPlayer /= averageXSquaresPlayerCounter;
         averageXCirclesPlayer /= averageXCirclesPlayerCounter;
 
-        XYChart.Series series1 = new XYChart.Series<String, Number>();
+        XYChart.Series<String, Number> series1 = new XYChart.Series<>();
         series1.setName("Average X");
-        series1.getData().add(new XYChart.Data<String, Number>("All Shapes", averageXTotal));
-        series1.getData().add(new XYChart.Data<String, Number>("Circles", averageXCircles));
-        series1.getData().add(new XYChart.Data<String, Number>("Squares", averageXSquares));
+        series1.getData().add(new XYChart.Data<>("All Shapes", averageXTotal));
+        series1.getData().add(new XYChart.Data<>("Circles", averageXCircles));
+        series1.getData().add(new XYChart.Data<>("Squares", averageXSquares));
 
-        XYChart.Series series2 = new XYChart.Series<String, Number>();
+        XYChart.Series<String, Number> series2 = new XYChart.Series<>();
         series2.setName("Average overestimated X");
-        series2.getData().add(new XYChart.Data<String, Number>("All Shapes", averageOverestimatedX));
-        series2.getData().add(new XYChart.Data<String, Number>("Circles", averageOverestimatedXCircles));
-        series2.getData().add(new XYChart.Data<String, Number>("Squares", averageOverestimatedXSquares));
+        series2.getData().add(new XYChart.Data<>("All Shapes", averageOverestimatedX));
+        series2.getData().add(new XYChart.Data<>("Circles", averageOverestimatedXCircles));
+        series2.getData().add(new XYChart.Data<>("Squares", averageOverestimatedXSquares));
 
-        XYChart.Series series3 = new XYChart.Series<String, Number>();
+        XYChart.Series<String, Number> series3 = new XYChart.Series<>();
         series3.setName("Optimal X");
-        series3.getData().add(new XYChart.Data<String, Number>("All Shapes", 1));
-        series3.getData().add(new XYChart.Data<String, Number>("Circles", 1));
-        series3.getData().add(new XYChart.Data<String, Number>("Squares", 1));
+        series3.getData().add(new XYChart.Data<>("All Shapes", 1));
+        series3.getData().add(new XYChart.Data<>("Circles", 1));
+        series3.getData().add(new XYChart.Data<>("Squares", 1));
 
-        XYChart.Series series4 = new XYChart.Series<String, Number>();
+        XYChart.Series<String, Number> series4 = new XYChart.Series<>();
         series4.setName("Average underestimated X");
-        series4.getData().add(new XYChart.Data<String, Number>("All Shapes", averageUnderestimatedX));
-        series4.getData().add(new XYChart.Data<String, Number>("Circles", averageUnderestimatedXCircles));
-        series4.getData().add(new XYChart.Data<String, Number>("Squares", averageUnderestimatedXSquares));
+        series4.getData().add(new XYChart.Data<>("All Shapes", averageUnderestimatedX));
+        series4.getData().add(new XYChart.Data<>("Circles", averageUnderestimatedXCircles));
+        series4.getData().add(new XYChart.Data<>("Squares", averageUnderestimatedXSquares));
 
-        XYChart.Series series5 = new XYChart.Series<String, Number>();
+        XYChart.Series<String, Number> series5 = new XYChart.Series<>();
         series5.setName("Your X");
-        series5.getData().add(new XYChart.Data<String, Number>("All Shapes", averageXPlayer));
-        series5.getData().add(new XYChart.Data<String, Number>("Circles", averageXCirclesPlayer));
-        series5.getData().add(new XYChart.Data<String, Number>("Squares", averageXSquaresPlayer));
+        series5.getData().add(new XYChart.Data<>("All Shapes", averageXPlayer));
+        series5.getData().add(new XYChart.Data<>("Circles", averageXCirclesPlayer));
+        series5.getData().add(new XYChart.Data<>("Squares", averageXSquaresPlayer));
 
         barChart.getData().addAll(series2, series1, series4, series3, series5);
 
@@ -497,19 +559,18 @@ public class CircleGame extends Application {
 
     }
 
-    BarChart<String, Number> generateAverageClicksBarChart(){
-        final CategoryAxis xAxis = new CategoryAxis();
-        final NumberAxis yAxis = new NumberAxis();
-        final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
-        barChart.setTitle("Unoptimal Clicks");
+    BarChart<Number, String> generateAverageClicksBarChart(List<GameObject> gameObjects){
+        final NumberAxis xAxis = new NumberAxis();
+        final CategoryAxis yAxis = new CategoryAxis();
+        final BarChart<Number,String> barChart = new BarChart<Number,String>(xAxis,yAxis);
+        barChart.setTitle("Clicks needed");
+        xAxis.setTickLabelRotation(90);
         xAxis.setLabel("Group");
         yAxis.setLabel("Clicks");
 
-        barChart.setMaxWidth(200);
-        barChart.setMinHeight(400);
+        barChart.setMaxWidth(300);
+        barChart.setMinHeight(200);
         //barChart.setCategoryGap(50);
-
-        List<GameObject> gameObjects = getGameObjects();
 
         int averageClicksOverOptimum = 0;
         for (GameObject go : gameObjects) {
@@ -517,12 +578,12 @@ public class CircleGame extends Application {
         }
         averageClicksOverOptimum/=gameObjects.size();
 
-        XYChart.Series series1 = new XYChart.Series<String, Number>();
-        series1.setName("Unoptimal Clicks");
-        series1.getData().add(new XYChart.Data<String, Number>("Total Average", averageClicksOverOptimum));
-        series1.getData().add(new XYChart.Data<String, Number>("Your Average", clicksOverOptimum));
+        XYChart.Series<Number, String> series1 = new XYChart.Series<>();
+        series1.setName("Clicks Needed");
+        series1.getData().add(new XYChart.Data<>(averageClicksOverOptimum, "Total Average"));
+        series1.getData().add(new XYChart.Data<>( clicksOverOptimum, "Your Average"));
 
-        barChart.getData().addAll(series1);
+        barChart.getData().add(series1);
 
         return barChart;
 
@@ -540,7 +601,7 @@ public class CircleGame extends Application {
             e.printStackTrace();
         }
 
-        URL obj = new URL("https://cms.reitz.dev/items/shape_game/");
+        URL obj = new URL("https://cms.reitz.dev/items/shape_game/?fields=user,average_x,clicks,id");
         HttpURLConnection postConnection = (HttpURLConnection) obj.openConnection();
         postConnection.setRequestMethod("POST");
         postConnection.setRequestProperty("Content-Type", "application/json");
@@ -550,6 +611,17 @@ public class CircleGame extends Application {
         os.flush();
         os.close();
         int responseCode = postConnection.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) { // success
+            BufferedReader in = new BufferedReader(new InputStreamReader(postConnection.getInputStream()));
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            // Slice because CMS sets data prefix
+            currentPlayer = objectMapper.readValue(response.substring(0, response.length()-1).substring(8), GameObject.class);
+        }
         if (responseCode != HttpURLConnection.HTTP_OK) {
             System.out.println("POST Response Code :  " + responseCode);
             System.out.println("POST Response Message : " + postConnection.getResponseMessage());
@@ -558,7 +630,7 @@ public class CircleGame extends Application {
     }
 
     private List<GameObject> getGameObjects() {
-        String response = getRequest("https://cms.reitz.dev/items/shape_game/?fields=user,average_x,clicks");
+        String response = getRequest("https://cms.reitz.dev/items/shape_game/?fields=user,average_x,clicks,id");
         try {
             return Arrays.asList(new ObjectMapper().readValue(response, GameObject[].class));
         } catch (IOException e) {
@@ -594,7 +666,6 @@ public class CircleGame extends Application {
             con.setRequestMethod("GET");
             con.setRequestProperty("Content-Type", "application/json");
             int responseCode = con.getResponseCode();
-            System.out.println("GET Response Code :: " + responseCode);
             if (responseCode == HttpURLConnection.HTTP_OK) { // success
                 BufferedReader in = new BufferedReader(new InputStreamReader(
                         con.getInputStream()));
@@ -615,7 +686,6 @@ public class CircleGame extends Application {
         }
         return null;
     }
-
 
     public static void main(String[] args) {
         launch(args);
