@@ -547,12 +547,6 @@ public class CircleGame extends Application {
         series2.getData().add(new XYChart.Data<>("Circles", averageOverestimatedXCircles));
         series2.getData().add(new XYChart.Data<>("Squares", averageOverestimatedXSquares));
 
-        XYChart.Series<String, Number> series3 = new XYChart.Series<>();
-        series3.setName("Optimal X");
-        series3.getData().add(new XYChart.Data<>("All Shapes", 1));
-        series3.getData().add(new XYChart.Data<>("Circles", 1));
-        series3.getData().add(new XYChart.Data<>("Squares", 1));
-
         XYChart.Series<String, Number> series4 = new XYChart.Series<>();
         series4.setName("Average underestimated X");
         series4.getData().add(new XYChart.Data<>("All Shapes", averageUnderestimatedX));
@@ -565,7 +559,7 @@ public class CircleGame extends Application {
         series5.getData().add(new XYChart.Data<>("Circles", averageXCirclesPlayer));
         series5.getData().add(new XYChart.Data<>("Squares", averageXSquaresPlayer));
 
-        barChart.getData().addAll(series2, series1, series4, series3, series5);
+        barChart.getData().addAll(series2, series1, series4, series5);
 
         return barChart;
 
@@ -574,11 +568,10 @@ public class CircleGame extends Application {
     BarChart<Number, String> generateAverageClicksBarChart(List<GameObject> gameObjects){
         final NumberAxis xAxis = new NumberAxis();
         final CategoryAxis yAxis = new CategoryAxis();
-        final BarChart<Number,String> barChart = new BarChart<Number,String>(xAxis,yAxis);
-        barChart.setTitle("Clicks needed");
+        final BarChart<Number,String> barChart = new BarChart<>(xAxis, yAxis);
+        barChart.setTitle("Clicks");
         xAxis.setTickLabelRotation(90);
-        xAxis.setLabel("Group");
-        yAxis.setLabel("Clicks");
+        xAxis.setLabel("Clicks over the minimum");
 
         barChart.setMaxWidth(300);
         barChart.setMinHeight(200);
@@ -594,8 +587,6 @@ public class CircleGame extends Application {
         series1.setName("Clicks Needed");
         series1.getData().add(new XYChart.Data<>(averageClicksOverOptimum, "Average clicks needed"));
         series1.getData().add(new XYChart.Data<>( clicksOverOptimum, "Your clicks needed"));
-
-        XYChart.Data test = new XYChart.Data<>(averageClicksOverOptimum, "Total Average");
 
         barChart.getData().add(series1);
 
