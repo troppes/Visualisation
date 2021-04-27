@@ -41,6 +41,7 @@ public class CircleGame extends Application {
     Shape generatedShape;
     float ratio;
     GameShape.shape currentShape;
+    GameShape.shape unplayedShape;
     HBox circlesBox;
     Button finishButton;
     Stage primaryStage;
@@ -187,10 +188,25 @@ public class CircleGame extends Application {
             randomRatio = ((int) (randomRatio * 10)) / 10f;    //Shorten float to first decimal place
         }
 
-        if (randomShape == 0)
-            currentShape = GameShape.shape.CIRCLE;
-        else
-            currentShape = GameShape.shape.SQUARE;
+        if(unplayedShape==null) {
+            if (randomShape == 0)
+                currentShape = GameShape.shape.CIRCLE;
+            else
+                currentShape = GameShape.shape.SQUARE;
+        }
+        else{
+            currentShape = unplayedShape;
+            randomShape = 1;
+            if(unplayedShape == GameShape.shape.CIRCLE) randomShape = 0;
+        }
+
+        //set the unplayed shape to whatever shape didn't get generated after the first level generation
+        //this is used, so that the first two shapes are always different ones
+        unplayedShape = null;
+        if(playedShapes.size() == 0){
+            unplayedShape = GameShape.shape.CIRCLE;
+            if(randomShape==0) unplayedShape = GameShape.shape.SQUARE;
+        }
 
         ratio = randomRatio;
 
@@ -340,7 +356,6 @@ public class CircleGame extends Application {
         generateResultScreen();
     }
 
-    //ToDo: Exchange this with our visualization
     void generateResultScreen() {
 
         List<GameShape> squareShapes = getSquares();
@@ -449,8 +464,6 @@ public class CircleGame extends Application {
         barChart.setMaxHeight(300);
         barChart.setCategoryGap(50);
 
-
-
         float averageXTotal = 0, averageXCircles = 0, averageXSquares = 0;
         float averageOverestimatedX = 0, averageOverestimatedXCircles = 0, averageOverestimatedXSquares = 0;
         int overestimatedCirclesCounter = 0, overestimatedSquaresCounter = 0;
@@ -505,7 +518,7 @@ public class CircleGame extends Application {
         averageUnderestimatedX /= underestimatedCirclesCounter+underestimatedSquaresCounter;
 
 
-        float averageXPlayer = totalX / playedShapes.size();
+        float averageXPlayer = currentPlayer.getAverage_x();
         float averageXSquaresPlayer = 0, averageXCirclesPlayer = 0;
         int averageXSquaresPlayerCounter = 0, averageXCirclesPlayerCounter = 0;
 
@@ -579,10 +592,15 @@ public class CircleGame extends Application {
 
         XYChart.Series<Number, String> series1 = new XYChart.Series<>();
         series1.setName("Clicks Needed");
-        series1.getData().add(new XYChart.Data<>(averageClicksOverOptimum, "Total Average"));
-        series1.getData().add(new XYChart.Data<>( clicksOverOptimum, "Your Average"));
+        series1.getData().add(new XYChart.Data<>(averageClicksOverOptimum, "Average clicks needed"));
+        series1.getData().add(new XYChart.Data<>( clicksOverOptimum, "Your clicks needed"));
+
+        XYChart.Data test = new XYChart.Data<>(averageClicksOverOptimum, "Total Average");
 
         barChart.getData().add(series1);
+
+        Tooltip t = new Tooltip("0 is the number of clicks you needed, to get the optimal X as a result. \n Any exceeding or missing number of clicks gets added to this variable");
+        Tooltip.install(barChart, t);
 
         return barChart;
 
