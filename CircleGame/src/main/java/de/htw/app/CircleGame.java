@@ -420,23 +420,22 @@ public class CircleGame extends Application {
         });
 
         TableView<GameObject> tableView = new TableView<>();
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
         TableColumn<GameObject, String> column1 = new TableColumn<>("Name");
         column1.setCellValueFactory(new PropertyValueFactory<>("user"));
 
-
         TableColumn<GameObject, String> column2 = new TableColumn<>("Score");
         column2.setCellValueFactory(new PropertyValueFactory<>("average_x"));
-
-        tableView.requestFocus();
-        // todo fix focus
-        tableView.getSelectionModel().select(gameObjects.indexOf(currentPlayer));
-        tableView.scrollTo(gameObjects.indexOf(currentPlayer));
 
         tableView.getColumns().add(column1);
         tableView.getColumns().add(column2);
 
         tableView.setItems(FXCollections.observableList(gameObjects));
+
+        //select current user
+        tableView.getSelectionModel().select(gameObjects.indexOf(currentPlayer));
+        tableView.scrollTo(gameObjects.indexOf(currentPlayer));
 
         return tableView;
     }
