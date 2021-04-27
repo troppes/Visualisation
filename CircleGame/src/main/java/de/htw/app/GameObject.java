@@ -63,12 +63,12 @@ public class GameObject {
         this.average_x = average_x;
     }
 
-    @JsonIgnore
+    @JsonProperty
     public GameShape[] getShapes_played() {
         return shapes_played;
     }
 
-    @JsonProperty
+    @JsonIgnore
     public void setShapes_played(GameShape[] shapes_played) {
         this.shapes_played = shapes_played;
     }
