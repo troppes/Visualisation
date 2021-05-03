@@ -17,10 +17,12 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="CircleGame" />
+        <module name="Vis02" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="CircleGame" target="11" />
+      <module name="Vis02" target="11" />
     </bytecodeTargetLevel>
   </component>
 </project>
