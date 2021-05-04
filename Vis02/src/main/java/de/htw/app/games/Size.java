@@ -7,40 +7,42 @@ import javafx.scene.shape.Shape;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Color extends GameMode{
+public class Size extends GameMode{
 
     //ToDo:
-    //Discuss Ideas: Colors get randomly generated from a larger set
-    //Many different random colors for distractors, but only one unique one for target?
     //Larger set of colors?
 
-    public Color(int levelDimensionX, int levelDimensionY) {
+    public Size(int levelDimensionX, int levelDimensionY) {
         super(levelDimensionX, levelDimensionY);
-        gameMode = possibleModes.COLOR;
+        gameMode = possibleModes.SIZE;
     }
 
     @Override
     public void generateLevel() {
         Random rand = new Random();
 
+        int randomColor = rand.nextInt(2); //0 = red, 1 = blue
         int randomShape = rand.nextInt(2);  //0 = Circle, 1 = Square
-        int randomColorTarget = rand.nextInt(2); //0 = target red, 1 = target blue
+        int randomSizeTarget = rand.nextInt(2); //0 = target smaller, 1 = target bigger
+
+        int targetShapeSize = shapeSize*2;
+        if(randomSizeTarget==0) targetShapeSize = shapeSize/2;
 
         //Random Shape
         Shape target;
 
         if(randomShape == 0){
-            target = new Circle(shapeSize/2); //so shapeSize is diameter, not radius
-            targetX = rand.nextInt(levelDimensionX-shapeSize) + shapeSize/2;
-            targetY = rand.nextInt(levelDimensionY-shapeSize) + shapeSize/2;
+            target = new Circle(targetShapeSize/2); //so shapeSize is diameter, not radius
+            targetX = rand.nextInt(levelDimensionX-targetShapeSize) + targetShapeSize/2;
+            targetY = rand.nextInt(levelDimensionY-targetShapeSize) + targetShapeSize/2;
 
             ((Circle)target).setCenterX(targetX); //random X position
             ((Circle)target).setCenterY(targetY); //random Y position
         }
         else {
-            target = new Rectangle(shapeSize, shapeSize); //so shapeSize is diameter, not radius
-            targetX = rand.nextInt(levelDimensionX-shapeSize);  //we don't need + shapeSize/2 here, because rectangles get drawn from their top left corner
-            targetY = rand.nextInt(levelDimensionY-shapeSize);  //we don't need + shapeSize/2 here, because rectangles get drawn from their top left corner
+            target = new Rectangle(targetShapeSize, targetShapeSize); //so shapeSize is diameter, not radius
+            targetX = rand.nextInt(levelDimensionX-targetShapeSize);  //we don't need + shapeSize/2 here, because rectangles get drawn from their top left corner
+            targetY = rand.nextInt(levelDimensionY-targetShapeSize);  //we don't need + shapeSize/2 here, because rectangles get drawn from their top left corner
 
             ((Rectangle)target).setX(targetX); //random X position
             ((Rectangle)target).setY(targetY); //random Y position
@@ -51,7 +53,7 @@ public class Color extends GameMode{
         }
 
         target.setFill(javafx.scene.paint.Color.DODGERBLUE);
-        if(randomColorTarget == 0) target.setFill(javafx.scene.paint.Color.CRIMSON);
+        if(randomColor == 0) target.setFill(javafx.scene.paint.Color.CRIMSON);
 
         level.getChildren().add(target);
 
@@ -67,7 +69,7 @@ public class Color extends GameMode{
             }
 
             distractor.setFill(javafx.scene.paint.Color.DODGERBLUE);
-            if(randomColorTarget == 1) distractor.setFill(javafx.scene.paint.Color.CRIMSON);
+            if(randomColor == 0) distractor.setFill(javafx.scene.paint.Color.CRIMSON);
 
             boolean intersection = true;
 

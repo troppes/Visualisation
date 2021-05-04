@@ -1,6 +1,9 @@
 de\htw\app\ConnectionManager.class
+de\htw\app\games\Orientation.class
+de\htw\app\games\Size.class
+de\htw\app\games\GameMode.class
 de\htw\app\Player.class
 de\htw\app\Vis02.class
 de\htw\app\games\Color.class
 de\htw\app\games\GameMode$possibleModes.class
-de\htw\app\games\GameMode.class
+de\htw\app\games\Grouping.class

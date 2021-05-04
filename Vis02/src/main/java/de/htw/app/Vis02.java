@@ -1,7 +1,6 @@
 package de.htw.app;
 
-import de.htw.app.games.Color;
-import de.htw.app.games.GameMode;
+import de.htw.app.games.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -33,7 +32,7 @@ public class Vis02 extends Application {
     Button skipPromptButton, startPromptButton;
 
     //game controller
-    int totalGameModes = 1; //set total game modes to number of different gameloops we want to play Each loop has to be prepared seperately
+    int totalGameModes = 4; //set total game modes to number of different gameloops we want to play Each loop has to be prepared seperately
 
     int[] timings = new int[] {1000, 500, 300, 200, 100};   //in ms
     int gameModeCounter = 0, timingCounter = 0;
@@ -100,37 +99,52 @@ public class Vis02 extends Application {
         root.getChildren().clear();
 
         GameMode gameMode = new Color(levelDimensionX, levelDimensionY);
+
+        Label heading;
+        Label subHeading = new Label("Viewtime: " + timings[timingCounter] + "ms");
+        subHeading.setFont(new Font("Arial", 20));
+
+        VBox headingBox = new VBox();
+        headingBox.setAlignment(Pos.CENTER);
+        root.setTop(headingBox);
+
+        startPromptButton = new Button("Start next prompt");
+        skipPromptButton = new Button("Didn't see target");
+        HBox bottomBox = new HBox();
+        bottomBox.setSpacing(10);
+        bottomBox.setAlignment(Pos.CENTER);
+        bottomBox.getChildren().addAll(startPromptButton, skipPromptButton);
+        root.setBottom(bottomBox);
+
         //ToDo: add other game modes and more modes for the mixed ones
         switch(gameModeCounter){
             case 0: //Color
-                Label heading = new Label("Find the differently colored target");
+                heading = new Label("Find the differently COLORED target");
                 heading.setFont(new Font("Arial", 30));
-                Label subHeading = new Label("Viewtime: " + timings[timingCounter] + "ms");
-                subHeading.setFont(new Font("Arial", 20));
-                VBox headingBox = new VBox();
-                headingBox.getChildren().add(heading);
-                headingBox.getChildren().add(subHeading);
-                headingBox.setAlignment(Pos.CENTER);
-                root.setTop(headingBox);
-
-                startPromptButton = new Button("Start next prompt");
-                skipPromptButton = new Button("Didn't see target");
-                HBox bottomBox = new HBox();
-                bottomBox.setSpacing(10);
-                bottomBox.getChildren().addAll(startPromptButton, skipPromptButton);
-                bottomBox.setAlignment(Pos.CENTER);
-                root.setBottom(bottomBox);
+                headingBox.getChildren().addAll(heading, subHeading);
 
                 gameMode = new Color(levelDimensionX, levelDimensionY);
                 break;
             case 1: //Orientation
+                heading = new Label("Find the differently ORIENTED target");
+                heading.setFont(new Font("Arial", 30));
+                headingBox.getChildren().addAll(heading, subHeading);
 
+                gameMode = new Orientation(levelDimensionX, levelDimensionY);
                 break;
             case 2: //Size
+                heading = new Label("Find the differently SIZED target");
+                heading.setFont(new Font("Arial", 30));
+                headingBox.getChildren().addAll(heading, subHeading);
 
+                gameMode = new Size(levelDimensionX, levelDimensionY);
                 break;
             case 3: //Grouping
+                heading = new Label("Find the differently GROUPED target");
+                heading.setFont(new Font("Arial", 30));
+                headingBox.getChildren().addAll(heading, subHeading);
 
+                gameMode = new Grouping(levelDimensionX, levelDimensionY);
                 break;
             case 4: //whatever mixed modes we come up with
 
@@ -142,7 +156,6 @@ public class Vis02 extends Application {
 
         Timeline timeline = new Timeline(new KeyFrame(Duration.millis(timings[timingCounter]), event -> root.setCenter(null)));
         timeline.setCycleCount(1);
-        timeline.play();
 
         gameMode.generateLevel();
         Pane activeLevel = gameMode.getLevel();
@@ -196,6 +209,9 @@ public class Vis02 extends Application {
         else{
             if(timingCounter < timings.length-1) { //min time hasn't been reached yet
                 timingCounter++;
+
+                playedGameModes.remove(playedGameModes.size()-1);
+                //remove the last game played, as it was succesfully completed
             }
             else{   //reset game if min time has been succesfully reached
                 gameModeCounter++;
@@ -218,8 +234,12 @@ public class Vis02 extends Application {
         ///placeholder\\\
         Label finish = new Label("Finito Pipito");
         finish.setFont(new Font("Arial", 80));
-        Label finishRecord = new Label("LowestTime: " + playedGameModes.get(playedGameModes.size()-1).getLowestTime());
-        finishRecord.setFont(new Font("Arial", 50));
+        String recordString = "";
+        for (GameMode gameMode : playedGameModes){
+            recordString += gameMode.getClass().getName() + ": " + gameMode.getLowestTime() + "\n";
+        }
+        Label finishRecord = new Label("LowestTimes:\n" + recordString);
+        finishRecord.setFont(new Font("Arial", 20));
         VBox headingBox = new VBox();
         headingBox.getChildren().addAll(finish, finishRecord);
         headingBox.setAlignment(Pos.CENTER);
