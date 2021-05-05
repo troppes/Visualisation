@@ -24,6 +24,10 @@ import java.util.*;
 
 public class Vis02 extends Application {
 
+    //ToDo:
+    //Discuss Idea: Add example prompt of how the target can look on the right hand side of the screen
+    //Maybe add more instructions?
+    
     private Player player = new Player();
 
     //Screen item references
