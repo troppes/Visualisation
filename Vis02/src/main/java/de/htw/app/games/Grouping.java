@@ -89,6 +89,8 @@ public class Grouping extends GameMode{
 
         //add all elements inside of the groupings
         for (Shape distractorGrouping : distractors) level.getChildren().addAll(generateGroupingElements(randomDisctractionGrouping, randomShape, randomColor, groupingSize, (int)((Circle)distractorGrouping).getCenterX(), (int)((Circle)distractorGrouping).getCenterY()));
+
+        applyModifiers();
     }
 
     ArrayList<Shape> generateGroupingElements(int groupingNumber, int randomShape, int randomColor, int groupingSize,  int groupingX, int groupingY){
@@ -152,6 +154,8 @@ public class Grouping extends GameMode{
 
             shapes.add(groupingItem);
         }
+
+        allShapes.addAll(shapes);
 
         return shapes;
     }

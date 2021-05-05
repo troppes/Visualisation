@@ -101,7 +101,13 @@ public class Color extends GameMode{
         }
 
         level.getChildren().addAll(distractors);
+
+        allShapes.add(target);
+        allShapes.addAll(distractors);
+
+        applyModifiers();
     }
+
 
     @Override
     public float getMeanDistance() {

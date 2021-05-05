@@ -27,7 +27,7 @@ public class Vis02 extends Application {
     //ToDo:
     //Discuss Idea: Add example prompt of how the target can look on the right hand side of the screen
     //Maybe add more instructions?
-    
+
     private Player player = new Player();
 
     //Screen item references
@@ -36,7 +36,7 @@ public class Vis02 extends Application {
     Button skipPromptButton, startPromptButton;
 
     //game controller
-    int totalGameModes = 4; //set total game modes to number of different gameloops we want to play Each loop has to be prepared seperately
+    int totalGameModes = 8; //set total game modes to number of different gameloops we want to play Each loop has to be prepared seperately
 
     int[] timings = new int[] {1000, 500, 300, 200, 100};   //in ms
     int gameModeCounter = 0, timingCounter = 0;
@@ -150,8 +150,37 @@ public class Vis02 extends Application {
 
                 gameMode = new Grouping(levelDimensionX, levelDimensionY);
                 break;
-            case 4: //whatever mixed modes we come up with
+            case 4: //Color + Orientation, Size
+                heading = new Label("Find the differently COLORED target");
+                heading.setFont(new Font("Arial", 30));
+                headingBox.getChildren().addAll(heading, subHeading);
 
+                gameMode = new Color(levelDimensionX, levelDimensionY);
+                gameMode.setDisctractors(new GameMode.possibleModes[]{GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE});
+                break;
+            case 5: //Orientation + Size, Color
+                heading = new Label("Find the differently ORIENTED target");
+                heading.setFont(new Font("Arial", 30));
+                headingBox.getChildren().addAll(heading, subHeading);
+
+                gameMode = new Orientation(levelDimensionX, levelDimensionY);
+                gameMode.setDisctractors(new GameMode.possibleModes[]{GameMode.possibleModes.SIZE, GameMode.possibleModes.COLOR});
+                break;
+            case 6: //Size + Color, Orientation
+                heading = new Label("Find the differently SIZED target");
+                heading.setFont(new Font("Arial", 30));
+                headingBox.getChildren().addAll(heading, subHeading);
+
+                gameMode = new Size(levelDimensionX, levelDimensionY);
+                gameMode.setDisctractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION});
+                break;
+            case 7: //Grouping + Color, Orientation, Size
+                heading = new Label("Find the differently GROUPED target");
+                heading.setFont(new Font("Arial", 30));
+                headingBox.getChildren().addAll(heading, subHeading);
+
+                gameMode = new Grouping(levelDimensionX, levelDimensionY);
+                gameMode.setDisctractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE});
                 break;
         }
 
