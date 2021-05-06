@@ -32,7 +32,7 @@ public class Size extends GameMode{
         Shape target;
 
         if(randomShape == 0){
-            target = new Circle(targetShapeSize/2); //so shapeSize is diameter, not radius
+            target = new Circle(targetShapeSize/2.0); //so shapeSize is diameter, not radius
             targetX = rand.nextInt(levelDimensionX-targetShapeSize) + targetShapeSize/2;
             targetY = rand.nextInt(levelDimensionY-targetShapeSize) + targetShapeSize/2;
 
@@ -62,7 +62,7 @@ public class Size extends GameMode{
         for (int i=0; i<numOfDistractors; i++){
             Shape distractor;
             if(randomShape == 0){
-                distractor = new Circle(shapeSize/2); //so shapeSize is diameter, not radius
+                distractor = new Circle(shapeSize/2.0); //so shapeSize is diameter, not radius
             }
             else {
                 distractor = new Rectangle(shapeSize, shapeSize); //so shapeSize is diameter, not radius
@@ -75,8 +75,8 @@ public class Size extends GameMode{
 
             while(intersection){
                 if(randomShape == 0){
-                    ((Circle)distractor).setCenterX(rand.nextInt(levelDimensionX-shapeSize) + shapeSize/2);
-                    ((Circle)distractor).setCenterY(rand.nextInt(levelDimensionY-shapeSize) + shapeSize/2);
+                    ((Circle)distractor).setCenterX(rand.nextInt(levelDimensionX-shapeSize) + shapeSize/2.0);
+                    ((Circle)distractor).setCenterY(rand.nextInt(levelDimensionY-shapeSize) + shapeSize/2.0);
                 }
                 else {
                     ((Rectangle)distractor).setX(rand.nextInt(levelDimensionX-shapeSize));  //we don't need + shapeSize/2 here, because rectangles get drawn from their top left corner
@@ -108,10 +108,5 @@ public class Size extends GameMode{
         allShapes.addAll(distractors);
 
         applyModifiers();
-    }
-
-    @Override
-    public float getMeanDistance() {
-        return -1;
     }
 }

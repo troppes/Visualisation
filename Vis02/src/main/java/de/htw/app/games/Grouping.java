@@ -1,6 +1,5 @@
 package de.htw.app.games;
 
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
@@ -111,7 +110,7 @@ public class Grouping extends GameMode{
             Shape groupingItem;
 
             if(randomShape == 0){
-                groupingItem = new Circle(shapeSize / 2); //so shapeSize is diameter, not radius
+                groupingItem = new Circle(shapeSize / 2.0); //so shapeSize is diameter, not radius
             }
             else {
                 groupingItem = new Rectangle(shapeSize, shapeSize); //so shapeSize is diameter, not radius
@@ -158,10 +157,5 @@ public class Grouping extends GameMode{
         allShapes.addAll(shapes);
 
         return shapes;
-    }
-
-    @Override
-    public float getMeanDistance() {
-        return -1;
     }
 }

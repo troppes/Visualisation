@@ -88,9 +88,4 @@ public class Orientation extends GameMode{
 
         applyModifiers();
     }
-
-    @Override
-    public float getMeanDistance() {
-        return -1;
-    }
 }
