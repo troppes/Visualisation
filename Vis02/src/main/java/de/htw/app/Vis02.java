@@ -246,7 +246,7 @@ public class Vis02 extends Application {
         } else {
             text.setText("Leider verfehlt!");
             levelBorder.setFill(javafx.scene.paint.Color.RED);
-            text.setStyle("-fx-text-fill: white; -fx-font-size: 32");
+            text.setStyle("-fx-fill: white; -fx-font-size: 32");
         }
         levelBorder.setStroke(javafx.scene.paint.Color.BLACK);
 
