@@ -1,7 +1,5 @@
 package de.htw.app;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import de.htw.app.games.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
