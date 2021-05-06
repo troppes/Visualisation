@@ -240,21 +240,18 @@ public class Vis02 extends Application {
         Rectangle levelBorder = new Rectangle(levelDimensionX, levelDimensionY);
         Text text = new Text();
         if (win) {
-            text.setText("Objekt gefunden! Weiter so!");
+            text.setText("Objekt gefunden! Weiter so! \n Klicke auf die Fläche, \n um die nächste Runde zu laden.");
             levelBorder.setFill(javafx.scene.paint.Color.GREEN);
-            text.setStyle("-fx-font-size: 32");
+            text.setStyle("-fx-font-size: 24");
         } else {
-            text.setText("Leider verfehlt!");
+            text.setText("Leider verfehlt! \n Klicke auf die Fläche, \n um die nächste Runde zu laden.");
             levelBorder.setFill(javafx.scene.paint.Color.RED);
-            text.setStyle("-fx-fill: white; -fx-font-size: 32");
+            text.setStyle("-fx-fill: white; -fx-font-size: 24");
         }
         levelBorder.setStroke(javafx.scene.paint.Color.BLACK);
-
         stack.getChildren().addAll(levelBorder, text);
-
-        root.setCenter(stack);
-
         stack.setOnMouseClicked(event -> loadGameScreen());
+        root.setCenter(stack);
     }
 
     void levelSuccessChecker(int targetX, int targetY, int guessX, int guessY) {
