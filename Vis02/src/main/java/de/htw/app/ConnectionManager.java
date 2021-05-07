@@ -33,8 +33,6 @@ public class ConnectionManager {
             // catch various errors
             e.printStackTrace();
         }
-        System.out.println(POST_PARAMS);
-        System.out.println(url);
 
         URL obj = new URL(url);
         HttpURLConnection postConnection = (HttpURLConnection) obj.openConnection();
