@@ -20,10 +20,10 @@ public class Size extends GameMode{
 
         int randomColor = rand.nextInt(2); //0 = red, 1 = blue
         int randomShape = rand.nextInt(2);  //0 = Circle, 1 = Square
-        int randomSizeTarget = rand.nextInt(2); //0 = target smaller, 1 = target bigger
+        //int randomSizeTarget = rand.nextInt(2); //0 = target smaller, 1 = target bigger
 
-        int targetShapeSize = shapeSize*2;
-        if(randomSizeTarget==0) targetShapeSize = shapeSize/2;
+        int targetShapeSize = (int)(shapeSize*1.75);
+        //if(randomSizeTarget==0) targetShapeSize = shapeSize/2;
 
         //Random Shape
         Shape target;

@@ -21,6 +21,10 @@ public class Color extends GameMode{
         int randomShape = rand.nextInt(2);  //0 = Circle, 1 = Square
         int randomColorTarget = rand.nextInt(2); //0 = target red, 1 = target blue
 
+        if(distractors.length > 0){ //if we're playing mixed modes, so that orientation affects the playing field
+            randomShape = 1;
+        }
+
         //Random Shape
         Shape target;
 

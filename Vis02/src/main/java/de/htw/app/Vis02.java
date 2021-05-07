@@ -36,7 +36,7 @@ public class Vis02 extends Application {
 
     int[] timings = new int[]{1000, 500, 300, 200, 100};   //in ms
     int gameModeCounter = 0, timingCounter = 0;
-    float minDistanceToPass = 30;
+    float minDistanceToPass = 40;
 
     //game mode
     int levelDimensionX = 500, levelDimensionY = 350;
@@ -255,6 +255,7 @@ public class Vis02 extends Application {
         // If Player played -> Add Distance to Mean
         if (targetX != -1) {
             player.addDistance((float) distance);
+            playedGameModes.get(playedGameModes.size() - 1).addDistance((float) distance);
         }
 
         if (targetX == -1 || distance > minDistanceToPass) {    //user pressed the skip button OR didn't guess correctly

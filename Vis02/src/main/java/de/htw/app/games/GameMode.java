@@ -43,6 +43,9 @@ public abstract class GameMode {
 
     //tracking data
     float lowestTime = -1;
+    @JsonProperty("mean_distance")
+    float meanDistance = -1;
+    int distanceCounter = 0;
 
     public GameMode(int levelDimensionX, int levelDimensionY) {
         this.levelDimensionX = levelDimensionX;
@@ -78,6 +81,17 @@ public abstract class GameMode {
     @JsonSetter("lowest_time")
     public void setLowestTime(float time) {
         lowestTime = time;
+    }
+
+    public float getMeanDistance() {
+        if(distanceCounter==0) return -1;
+
+        return meanDistance/distanceCounter;
+    }
+
+    public void addDistance(float distance) {
+        distanceCounter++;
+        this.meanDistance += distance;
     }
 
     public int getTargetX() {
