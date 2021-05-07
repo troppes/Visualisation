@@ -45,4 +45,12 @@ public class Player {
     public void addDistance(float distance) {
         setMeanDistance(distance / ++distanceCounter);
     }
+
+    public float getMeanTime() {
+        return meanTime;
+    }
+
+    public float getMeanDistance() {
+        return meanDistance;
+    }
 }

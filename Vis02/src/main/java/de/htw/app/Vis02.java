@@ -294,9 +294,7 @@ public class Vis02 extends Application {
 
         player.setGames(playedGameModes);
 
-        //ToDo
-        ///placeholder\\\
-        Label finish = new Label("Finito Pipito");
+        Label finish = new Label("Results");
         finish.setFont(new Font("Arial", 80));
         StringBuilder recordString = new StringBuilder();
 
@@ -318,13 +316,17 @@ public class Vis02 extends Application {
         }
 
 
-        Label finishRecord = new Label("LowestTimes:\n" + recordString);
-        finishRecord.setFont(new Font("Arial", 20));
+        Label finishRecord = new Label("Times:\n" + recordString);
+        Label meanTimeLabel = new Label("Mean Time: " + player.getMeanTime());
+        Label meanDistanceLabel = new Label("Mean Distance: " + player.getMeanDistance());
+        finishRecord.setFont(new Font("Arial", 12));
+        meanTimeLabel.setFont(new Font("Arial", 12));
+        meanDistanceLabel.setFont(new Font("Arial", 12));
+
         VBox headingBox = new VBox();
-        headingBox.getChildren().addAll(finish, finishRecord);
+        headingBox.getChildren().addAll(finish, finishRecord, meanTimeLabel, meanDistanceLabel);
         headingBox.setAlignment(Pos.CENTER);
         root.setTop(headingBox);
-        ///placeholder\\\
     }
 
     public static void main(String[] args) {
