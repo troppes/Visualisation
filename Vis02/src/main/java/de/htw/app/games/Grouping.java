@@ -25,16 +25,19 @@ public class Grouping extends GameMode{
         levelBorder.setFill(javafx.scene.paint.Color.TRANSPARENT);
         levelBorder.setStroke(javafx.scene.paint.Color.BLACK);
 
+        level.getChildren().add(levelBorder);
+
         Random rand = new Random();
 
         int randomColor = rand.nextInt(2); //0 = red, 1 = blue
         int randomShape = rand.nextInt(2);  //0 = Circle, 1 = Square
         int randomTargetGrouping = rand.nextInt(3)+1;  //1, 2, 3
-        int randomDisctractionGrouping = rand.nextInt(3)+1;  //1, 2, 3
+        int randomDisctractionGrouping = rand.nextInt(2)+2;  //2, 3
 
-        while (randomDisctractionGrouping==randomTargetGrouping) randomDisctractionGrouping = rand.nextInt(3)+1;
+        while (randomDisctractionGrouping==randomTargetGrouping) randomDisctractionGrouping = rand.nextInt(2)+2;
 
-        int groupingSize = (int)(shapeSize*1.75);
+        int groupingSize = (int)(shapeSize*1.75);   //og
+        groupingSize *= 1.25;    //increase circle size cause Flo is afraid he can't see groupings. Bitch.
 
         Circle targetGrouping = new Circle(groupingSize, Color.TRANSPARENT); //so shapeSize is diameter, not radius
         targetX = rand.nextInt(levelDimensionX-groupingSize*2) + groupingSize;
@@ -46,7 +49,7 @@ public class Grouping extends GameMode{
         level.getChildren().add(targetGrouping);
 
         //generates shapes within the grouping
-        level.getChildren().addAll(generateGroupingElements(randomTargetGrouping, randomShape, randomColor, groupingSize, targetX, targetY));
+        level.getChildren().addAll(generateGroupingElements(randomTargetGrouping, randomShape, randomColor, (int)(groupingSize/1.25), targetX, targetY));    // /1.5 so we only draw on a smaller inner circle in the grouping
 
         ArrayList<Shape> distractors = new ArrayList<>();
         int cantFindPositionCounter;
@@ -89,7 +92,7 @@ public class Grouping extends GameMode{
         level.getChildren().addAll(distractors);
 
         //add all elements inside of the groupings
-        for (Shape distractorGrouping : distractors) level.getChildren().addAll(generateGroupingElements(randomDisctractionGrouping, randomShape, randomColor, groupingSize, (int)((Circle)distractorGrouping).getCenterX(), (int)((Circle)distractorGrouping).getCenterY()));
+        for (Shape distractorGrouping : distractors) level.getChildren().addAll(generateGroupingElements(randomDisctractionGrouping, randomShape, randomColor, (int)(groupingSize/1.25), (int)((Circle)distractorGrouping).getCenterX(), (int)((Circle)distractorGrouping).getCenterY()));
 
         applyModifiers();
     }

@@ -21,6 +21,8 @@ public class Orientation extends GameMode{
         levelBorder.setFill(javafx.scene.paint.Color.TRANSPARENT);
         levelBorder.setStroke(javafx.scene.paint.Color.BLACK);
 
+        level.getChildren().add(levelBorder);
+
         Random rand = new Random();
 
         int randomRotationTarget = rand.nextInt(2);  //0 = Target 0 degrees, 1 = Target 45 Degrees

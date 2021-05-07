@@ -22,6 +22,8 @@ public class Size extends GameMode{
         levelBorder.setFill(javafx.scene.paint.Color.TRANSPARENT);
         levelBorder.setStroke(javafx.scene.paint.Color.BLACK);
 
+        level.getChildren().add(levelBorder);
+
         Random rand = new Random();
 
         int randomColor = rand.nextInt(2); //0 = red, 1 = blue
