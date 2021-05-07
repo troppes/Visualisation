@@ -44,7 +44,7 @@ public abstract class GameMode {
     //tracking data
     float lowestTime = -1;
     @JsonProperty("mean_distance")
-    float meanDistance = -1;
+    float meanDistance = 0;
     int distanceCounter = 0;
 
     public GameMode(int levelDimensionX, int levelDimensionY) {
@@ -52,11 +52,6 @@ public abstract class GameMode {
         this.levelDimensionY = levelDimensionY;
 
         level.setMaxSize(levelDimensionX, levelDimensionY);
-        Rectangle levelBorder = new Rectangle(levelDimensionX, levelDimensionY);
-        levelBorder.setFill(javafx.scene.paint.Color.TRANSPARENT);
-        levelBorder.setStroke(javafx.scene.paint.Color.BLACK);
-
-        level.getChildren().addAll(levelBorder);
     }
 
     public abstract void generateLevel();
@@ -83,6 +78,7 @@ public abstract class GameMode {
         lowestTime = time;
     }
 
+    @JsonGetter("mean_distance")
     public float getMeanDistance() {
         if(distanceCounter==0) return -1;
 

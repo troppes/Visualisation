@@ -16,6 +16,14 @@ public class Color extends GameMode{
 
     @Override
     public void generateLevel() {
+        level.getChildren().clear();
+
+        Rectangle levelBorder = new Rectangle(levelDimensionX, levelDimensionY);
+        levelBorder.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        levelBorder.setStroke(javafx.scene.paint.Color.BLACK);
+
+        level.getChildren().add(levelBorder);
+
         Random rand = new Random();
 
         int randomShape = rand.nextInt(2);  //0 = Circle, 1 = Square

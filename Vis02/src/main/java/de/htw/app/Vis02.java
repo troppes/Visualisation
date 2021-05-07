@@ -40,6 +40,7 @@ public class Vis02 extends Application {
 
     //game mode
     int levelDimensionX = 500, levelDimensionY = 350;
+    GameMode gameMode = new Color(levelDimensionX, levelDimensionY);
 
     //tracking
     ArrayList<GameMode> playedGameModes = new ArrayList<>();
@@ -104,8 +105,6 @@ public class Vis02 extends Application {
     void loadGameScreen() {
         root.getChildren().clear();
 
-        GameMode gameMode = new Color(levelDimensionX, levelDimensionY);
-
         Label heading;
         Label subHeading = new Label("View-time: " + timings[timingCounter] + "ms");
         subHeading.setFont(new Font("Arial", 20));
@@ -122,66 +121,67 @@ public class Vis02 extends Application {
         bottomBox.getChildren().addAll(startPromptButton, skipPromptButton);
         root.setBottom(bottomBox);
 
+
         switch (gameModeCounter) {
             case 0: //Color
                 heading = new Label("Find the differently COLORED target");
                 heading.setFont(new Font("Arial", 30));
                 headingBox.getChildren().addAll(heading, subHeading);
 
-                gameMode = new Color(levelDimensionX, levelDimensionY);
+                if(timingCounter==0) gameMode = new Color(levelDimensionX, levelDimensionY);
                 break;
             case 1: //Orientation
                 heading = new Label("Find the differently ORIENTED target");
                 heading.setFont(new Font("Arial", 30));
                 headingBox.getChildren().addAll(heading, subHeading);
 
-                gameMode = new Orientation(levelDimensionX, levelDimensionY);
+                if(timingCounter==0) gameMode = new Orientation(levelDimensionX, levelDimensionY);
                 break;
             case 2: //Size
                 heading = new Label("Find the differently SIZED target");
                 heading.setFont(new Font("Arial", 30));
                 headingBox.getChildren().addAll(heading, subHeading);
 
-                gameMode = new Size(levelDimensionX, levelDimensionY);
+                if(timingCounter==0) gameMode = new Size(levelDimensionX, levelDimensionY);
                 break;
             case 3: //Grouping
                 heading = new Label("Find the differently GROUPED target");
                 heading.setFont(new Font("Arial", 30));
                 headingBox.getChildren().addAll(heading, subHeading);
 
-                gameMode = new Grouping(levelDimensionX, levelDimensionY);
+                if(timingCounter==0) gameMode = new Grouping(levelDimensionX, levelDimensionY);
                 break;
             case 4: //Color + Orientation, Size
                 heading = new Label("Find the differently COLORED target");
                 heading.setFont(new Font("Arial", 30));
                 headingBox.getChildren().addAll(heading, subHeading);
 
-                gameMode = new Color(levelDimensionX, levelDimensionY);
-                gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE});
+                if(timingCounter==0) gameMode = new Color(levelDimensionX, levelDimensionY);
+                if(timingCounter==0) gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE});
                 break;
             case 5: //Orientation + Size, Color
                 heading = new Label("Find the differently ORIENTED target");
                 heading.setFont(new Font("Arial", 30));
                 headingBox.getChildren().addAll(heading, subHeading);
 
-                gameMode = new Orientation(levelDimensionX, levelDimensionY);
-                gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.SIZE, GameMode.possibleModes.COLOR});
+                if(timingCounter==0) gameMode = new Orientation(levelDimensionX, levelDimensionY);
+                if(timingCounter==0) gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.SIZE, GameMode.possibleModes.COLOR});
                 break;
             case 6: //Size + Color, Orientation
                 heading = new Label("Find the differently SIZED target");
                 heading.setFont(new Font("Arial", 30));
                 headingBox.getChildren().addAll(heading, subHeading);
 
-                gameMode = new Size(levelDimensionX, levelDimensionY);
-                gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION});
+                if(timingCounter==0) gameMode = new Size(levelDimensionX, levelDimensionY);
+                if(timingCounter==0) gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION});
                 break;
             case 7: //Grouping + Color, Orientation, Size
                 heading = new Label("Find the differently GROUPED target");
                 heading.setFont(new Font("Arial", 30));
                 headingBox.getChildren().addAll(heading, subHeading);
 
-                gameMode = new Grouping(levelDimensionX, levelDimensionY);
-                gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE});
+                if(timingCounter==0) gameMode = new Grouping(levelDimensionX, levelDimensionY);
+                if(timingCounter==0) gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE});
                 break;
         }
 
@@ -194,7 +194,7 @@ public class Vis02 extends Application {
         gameMode.generateLevel();
         Pane activeLevel = gameMode.getLevel();
 
-        playedGameModes.add(gameMode);  //adding the current game mode as the last played game mode
+        if(timingCounter==0) playedGameModes.add(gameMode);  //adding the current game mode as the last played game mode
 
         startPromptButton.setOnAction(event -> {
             startPromptButton.setDisable(true);
@@ -269,7 +269,7 @@ public class Vis02 extends Application {
             win = true;
             if (timingCounter < timings.length - 1) { //min time hasn't been reached yet
                 timingCounter++;
-                playedGameModes.remove(playedGameModes.size() - 1); //remove the last game played, as it was successfully completed
+                if(timingCounter==0) playedGameModes.remove(playedGameModes.size() - 1); //remove the last game played, as it was successfully completed
             } else {   //reset game if min time has been successfully reached
                 gameModeCounter++;
                 playedGameModes.get(playedGameModes.size() - 1).setLowestTime(timings[timingCounter]);    //write the current lowest time into the game mode
@@ -290,6 +290,8 @@ public class Vis02 extends Application {
         Label finish = new Label("Results");
         finish.setFont(new Font("Arial", 80));
         StringBuilder recordString = new StringBuilder();
+
+        playedGameModes.get(0).getMeanDistance();
 
         float meanTime = 0F;
         for (GameMode gameMode : playedGameModes) {

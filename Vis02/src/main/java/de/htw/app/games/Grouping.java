@@ -19,6 +19,12 @@ public class Grouping extends GameMode{
 
     @Override
     public void generateLevel() {
+        level.getChildren().clear();
+
+        Rectangle levelBorder = new Rectangle(levelDimensionX, levelDimensionY);
+        levelBorder.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        levelBorder.setStroke(javafx.scene.paint.Color.BLACK);
+
         Random rand = new Random();
 
         int randomColor = rand.nextInt(2); //0 = red, 1 = blue
