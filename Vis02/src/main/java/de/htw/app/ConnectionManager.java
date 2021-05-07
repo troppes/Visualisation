@@ -2,6 +2,7 @@ package de.htw.app;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -11,17 +12,17 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+
 public class ConnectionManager {
 
-
     /**
-     *
      * @param url The url for posting (without any ?-Params)
-     * @param go The object to send
+     * @param go  The object to send
      * @return The id of the posted object
      * @throws IOException If the object cant be sent
      */
-    public static int POSTRequest(String url ,Object go) throws IOException {
+    public static int POSTRequest(String url, Player go) throws IOException {
 
         url += "?fields=id";
         ObjectMapper objectMapper = new ObjectMapper();
@@ -53,17 +54,23 @@ public class ConnectionManager {
             }
             in.close();
             // Slice because CMS sets data prefix
-            ReturnItem item = objectMapper.readValue(response.substring(0, response.length()-1).substring(8), ReturnItem.class);
+            ReturnItem item = objectMapper.readValue(response.substring(0, response.length() - 1).substring(8), ReturnItem.class);
             return item.id;
-        } else{
+        } else {
             System.out.println("POST Response Code :  " + responseCode);
             System.out.println("POST Response Message : " + postConnection.getResponseMessage());
             throw new IOException("Posting the data did not work!");
         }
     }
 
-    // todo maybe generify
-    private static String getRequest(String url) {
+    /**
+     *
+     * @param url Url for the GET request
+     * @param valueType Class of the object for deserialization
+     * @param <T> Return Class
+     * @return List of elements from given class
+     */
+    public static <T> List<T> GETRequest(String url, Class<T> valueType) {
         try {
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -80,8 +87,10 @@ public class ConnectionManager {
                     response.append(inputLine);
                 }
                 in.close();
-                // Slice since cms gives us a wrapper
-                return response.substring(0, response.length()-1).substring(8);
+
+                ObjectMapper mapper = new ObjectMapper();
+                return mapper.readValue(response.substring(0, response.length() - 1).substring(8),
+                        mapper.getTypeFactory().constructCollectionType(List.class, valueType));
             } else {
                 throw new IOException("Get Request for the GameObjects failed!");
             }
