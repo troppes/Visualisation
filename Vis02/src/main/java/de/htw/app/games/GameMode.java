@@ -56,7 +56,14 @@ public abstract class GameMode {
         level.getChildren().addAll(levelBorder);
     }
 
-    public void generateLevel() {
+    public abstract void generateLevel();
+
+    public possibleModes getGameMode() {
+        return gameMode;
+    }
+
+    public possibleModes[] getDistractors() {
+        return distractors;
     }
 
     public Pane getLevel() {

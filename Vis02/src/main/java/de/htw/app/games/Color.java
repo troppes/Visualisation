@@ -9,11 +9,6 @@ import java.util.Random;
 
 public class Color extends GameMode{
 
-    //ToDo:
-    //Discuss Ideas: Colors get randomly generated from a larger set
-    //Many different random colors for distractors, but only one unique one for target?
-    //Larger set of colors?
-
     public Color(int levelDimensionX, int levelDimensionY) {
         super(levelDimensionX, levelDimensionY);
         gameMode = possibleModes.COLOR;

@@ -24,10 +24,6 @@ import java.util.*;
 
 public class Vis02 extends Application {
 
-    //ToDo:
-    //Discuss Idea: Add example prompt of how the target can look on the right hand side of the screen
-    //Maybe add more instructions?
-
     private final Player player = new Player();
 
     //Screen item references
@@ -69,14 +65,13 @@ public class Vis02 extends Application {
 
         //INSTRUCTIONS SCREEN
         Text welcomeMessage = new Text(String.join("\n"
-                , "Welcome " + player.getName() + ","
-                , "thank you for playing our Game! \n"
-                , "Controls:"
-                , "w or Button + = Increase shape size"
-                , "s or Button - = Decrease shape size"
-                , "e or Button ++ = Increase shape size * 5"
-                , "d or Button -- = Decrease shape size * 5 \n"
-                , "You can play as many shapes as you want, but after you have played three shapes, you can press the FINISH button to see your results."
+                , "Welcome " + player.getName() + ", \n"
+                , "thank you for playing our game! \n"
+                , "The goal of the game is to find the target. \n"
+                , "The target is an outlier, that has e.g. another color. The specific difference is shown in the label on the top of the window.\n"
+                , "We show you the playing field for different amounts of time to test your pre-attentive perception, \n"
+                , "and afterwards you need to click where you think you saw the target. If you did not see it, you can always click the button \n"
+                , "\"I did not see the target\"."
         ));
         welcomeMessage.setStyle("-fx-font: 14 monospaced;");
 
@@ -84,7 +79,7 @@ public class Vis02 extends Application {
         instructions.getDialogPane().setContent(welcomeMessage);
         instructions.setTitle("Instructions");
         instructions.setHeaderText("Instructions");
-        //instructions.showAndWait();
+        instructions.showAndWait();
 
 
         //GAME SCREEN
@@ -102,7 +97,7 @@ public class Vis02 extends Application {
         });
 
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Vis02");
+        primaryStage.setTitle("Find Waldo: Reaction Edition");
         primaryStage.show();
     }
 
@@ -120,14 +115,13 @@ public class Vis02 extends Application {
         root.setTop(headingBox);
 
         startPromptButton = new Button("Start next prompt");
-        skipPromptButton = new Button("Didn't see target");
+        skipPromptButton = new Button("Did not see target");
         HBox bottomBox = new HBox();
         bottomBox.setSpacing(10);
         bottomBox.setAlignment(Pos.CENTER);
         bottomBox.getChildren().addAll(startPromptButton, skipPromptButton);
         root.setBottom(bottomBox);
 
-        //ToDo: add other game modes and more modes for the mixed ones
         switch (gameModeCounter) {
             case 0: //Color
                 heading = new Label("Find the differently COLORED target");
@@ -240,11 +234,11 @@ public class Vis02 extends Application {
         Rectangle levelBorder = new Rectangle(levelDimensionX, levelDimensionY);
         Text text = new Text();
         if (win) {
-            text.setText("Objekt gefunden! Weiter so! \n Klicke auf die Fläche, \n um die nächste Runde zu laden.");
+            text.setText("Object found! Very well! \nClick on this area, \nto start the next round.");
             levelBorder.setFill(javafx.scene.paint.Color.GREEN);
             text.setStyle("-fx-font-size: 24");
         } else {
-            text.setText("Leider verfehlt! \n Klicke auf die Fläche, \n um die nächste Runde zu laden.");
+            text.setText("Missed! \nClick on this area, \nto start the next round.");
             levelBorder.setFill(javafx.scene.paint.Color.RED);
             text.setStyle("-fx-fill: white; -fx-font-size: 24");
         }
@@ -265,8 +259,6 @@ public class Vis02 extends Application {
 
         if (targetX == -1 || distance > minDistanceToPass) {    //user pressed the skip button OR didn't guess correctly
             gameModeCounter++;
-
-            //Todo: Vereinfachen -> Ich glaub das kann einfach weg, wir setzen den doch bei erfolgreichen game schon
             if (timingCounter > 0)   //user has successfully passed at least one test
                 playedGameModes.get(playedGameModes.size() - 1).setLowestTime(timings[timingCounter - 1]);    //write the last successful lowest time into the game mode
             else
@@ -300,28 +292,30 @@ public class Vis02 extends Application {
 
         float meanTime = 0F;
         for (GameMode gameMode : playedGameModes) {
-            if (gameMode.getLowestTime() == -1) {
-                meanTime += 5.0;
+            if (gameMode.getLowestTime() == -1) { // Add a 3 second penalty, if they fail on the 1 second barrier.
+                meanTime += 2000;
             } else {
                 meanTime += gameMode.getLowestTime();
             }
-            recordString.append(gameMode.getClass().getName()).append(": ").append(gameMode.getLowestTime()).append("\n");
+            String numberOfDistractors = gameMode.getDistractors().length == 0 ? "none" : Arrays.toString(gameMode.getDistractors());
+            recordString.append(gameMode.getGameMode()).append(" with ").append(numberOfDistractors)
+                    .append(" distractions. Your lowest time: ").append(gameMode.getLowestTime()).append("\n");
         }
         player.setMeanTime(meanTime);
 
         try {
-            System.out.println(ConnectionManager.POSTRequest("https://cms.reitz.dev/items/vis02_player/", player));
+            player.setId(ConnectionManager.POSTRequest("https://cms.reitz.dev/items/vis02_player/", player));
         } catch (IOException e) {
             System.out.println("Failed to send data!");
         }
 
 
         Label finishRecord = new Label("Times:\n" + recordString);
-        Label meanTimeLabel = new Label("Mean Time: " + player.getMeanTime());
-        Label meanDistanceLabel = new Label("Mean Distance: " + player.getMeanDistance());
-        finishRecord.setFont(new Font("Arial", 12));
-        meanTimeLabel.setFont(new Font("Arial", 12));
-        meanDistanceLabel.setFont(new Font("Arial", 12));
+        Label meanTimeLabel = new Label("Mean Time: " + player.getMeanTime()+"ms");
+        Label meanDistanceLabel = new Label("Mean Distance: " + player.getMeanDistance()+"px");
+        finishRecord.setFont(new Font("Arial", 20));
+        meanTimeLabel.setFont(new Font("Arial", 20));
+        meanDistanceLabel.setFont(new Font("Arial", 20));
 
         VBox headingBox = new VBox();
         headingBox.getChildren().addAll(finish, finishRecord, meanTimeLabel, meanDistanceLabel);

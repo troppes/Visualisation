@@ -9,9 +9,6 @@ import java.util.Random;
 
 public class Size extends GameMode{
 
-    //ToDo:
-    //Larger set of colors?
-
     public Size(int levelDimensionX, int levelDimensionY) {
         super(levelDimensionX, levelDimensionY);
         gameMode = possibleModes.SIZE;

@@ -8,10 +8,6 @@ import java.util.Random;
 
 public class Orientation extends GameMode{
 
-    //ToDo:
-    //Larger set of colors?
-
-
     public Orientation(int levelDimensionX, int levelDimensionY) {
         super(levelDimensionX, levelDimensionY);
         gameMode = possibleModes.ORIENTATION;
@@ -74,7 +70,7 @@ public class Orientation extends GameMode{
                 }
             }
 
-            if(randomRotationTarget==0) { //ToDo: put back in
+            if(randomRotationTarget==0) {
                 distractor.setRotate(45);
             }
 

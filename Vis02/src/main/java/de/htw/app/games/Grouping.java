@@ -10,10 +10,6 @@ import java.util.Random;
 
 public class Grouping extends GameMode{
 
-    //ToDo:
-    //whole class implementation
-    //Randomly generate grouping size of target and distractors
-
     public Grouping(int levelDimensionX, int levelDimensionY) {
         super(levelDimensionX, levelDimensionY);
         gameMode = possibleModes.GROUPING;
