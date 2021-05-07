@@ -85,6 +85,12 @@ public abstract class GameMode {
         return meanDistance/distanceCounter;
     }
 
+    @JsonSetter("mean_distance")
+    public void setMeanDistance(float meanDistance) {
+        distanceCounter = 1;
+        this.meanDistance = meanDistance;
+    }
+
     public void addDistance(float distance) {
         distanceCounter++;
         this.meanDistance += distance;

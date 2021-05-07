@@ -4,12 +4,11 @@ import de.htw.app.games.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
@@ -202,7 +201,6 @@ public class Vis02 extends Application {
             timeline.play();
             timeline.setOnFinished(timelineEvent -> loadTargetFindingScreen());
         });
-
     }
 
     void loadTargetFindingScreen() {
@@ -300,7 +298,7 @@ public class Vis02 extends Application {
             } else {
                 meanTime += gameMode.getLowestTime();
             }
-            String numberOfDistractors = gameMode.getDistractors().length == 0 ? "none" : Arrays.toString(gameMode.getDistractors());
+            String numberOfDistractors = gameMode.getDistractors().length == 0 ? "no" : Arrays.toString(gameMode.getDistractors());
             recordString.append(gameMode.getGameMode()).append(" with ").append(numberOfDistractors)
                     .append(" distractions. Your lowest time: ").append(gameMode.getLowestTime()).append("\n");
         }
@@ -312,6 +310,10 @@ public class Vis02 extends Application {
             System.out.println("Failed to send data!");
         }
 
+        List<Player> players = ConnectionManager.GETRequest("https://cms.reitz.dev/items/vis02_player/?fields=id,name,mean_distance,mean_time", Player.class);
+
+        assert players != null;
+        root.setRight(generatePlayerTable(players));
 
         Label finishRecord = new Label("Times:\n" + recordString);
         Label meanTimeLabel = new Label("Mean Time: " + player.getMeanTime()+"ms");
@@ -323,7 +325,40 @@ public class Vis02 extends Application {
         VBox headingBox = new VBox();
         headingBox.getChildren().addAll(finish, finishRecord, meanTimeLabel, meanDistanceLabel);
         headingBox.setAlignment(Pos.CENTER);
-        root.setTop(headingBox);
+        root.setCenter(headingBox);
+    }
+
+    TableView<Player> generatePlayerTable(List<Player> players) {
+
+        TableView<Player> tableView = new TableView<>();
+        tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+
+        TableColumn<Player, String> column1 = new TableColumn<>("Name");
+        column1.setCellValueFactory(new PropertyValueFactory<>("name"));
+
+        TableColumn<Player, String> column2 = new TableColumn<>("Mean time");
+        column2.setSortType(TableColumn.SortType.DESCENDING);
+        column2.setCellValueFactory(new PropertyValueFactory<>("meanTime"));
+        column2.setComparator(column2.getComparator().reversed());
+
+        TableColumn<Player, String> column3 = new TableColumn<>("Mean distance");
+        column3.setCellValueFactory(new PropertyValueFactory<>("meanDistance"));
+        column3.setComparator(column3.getComparator().reversed());
+
+        tableView.getColumns().add(column1);
+        tableView.getColumns().add(column2);
+        tableView.getColumns().add(column3);
+
+        tableView.setItems(FXCollections.observableList(players));
+
+        tableView.getSortOrder().add(column2);
+        tableView.sort();
+
+        //select current user
+        tableView.getSelectionModel().select(players.indexOf(player));
+        tableView.scrollTo(players.indexOf(player));
+
+        return tableView;
     }
 
     public static void main(String[] args) {

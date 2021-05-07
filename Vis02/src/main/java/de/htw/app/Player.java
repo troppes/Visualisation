@@ -1,11 +1,13 @@
 package de.htw.app;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import de.htw.app.games.GameMode;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Player {
 
@@ -13,7 +15,7 @@ public class Player {
 
     @JsonProperty
     private String name;
-    @JsonProperty
+
     private ArrayList<GameMode> games;
 
     @JsonProperty("mean_distance")
@@ -42,8 +44,14 @@ public class Player {
         return name;
     }
 
+    @JsonIgnore
     public void setGames(ArrayList<GameMode> games) {
         this.games = games;
+    }
+
+    @JsonGetter("games")
+    public ArrayList<GameMode> getGames() {
+        return games;
     }
 
     public void setMeanTime(float meanTime) {
@@ -59,8 +67,26 @@ public class Player {
         return meanTime;
     }
 
+    public void setMeanDistance(float meanDistance) {
+        distanceCounter = 1;
+        this.meanDistance = meanDistance;
+    }
+
     public float getMeanDistance() {
         if(distanceCounter==0) return -1;
         return meanDistance/distanceCounter;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player that = (Player) o;
+        return id == that.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
