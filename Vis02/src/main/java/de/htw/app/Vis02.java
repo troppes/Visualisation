@@ -302,7 +302,7 @@ public class Vis02 extends Application {
             recordString.append(gameMode.getGameMode()).append(" with ").append(numberOfDistractors)
                     .append(" distractions. Your lowest time: ").append(gameMode.getLowestTime()).append("\n");
         }
-        player.setMeanTime(meanTime);
+        player.setMeanTime(meanTime/playedGameModes.size());
 
         try {
             player.setId(ConnectionManager.POSTRequest("https://cms.reitz.dev/items/vis02_player/", player));

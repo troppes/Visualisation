@@ -56,11 +56,11 @@ public class Player {
     }
 
     public float getMeanTime() {
-        if(distanceCounter==0) return -1;
-        return meanTime/distanceCounter;
+        return meanTime;
     }
 
     public float getMeanDistance() {
-        return meanDistance;
+        if(distanceCounter==0) return -1;
+        return meanDistance/distanceCounter;
     }
 }
