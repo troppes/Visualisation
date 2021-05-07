@@ -42,7 +42,12 @@ public class Orientation extends GameMode{
 
         ArrayList<Shape> distractors = new ArrayList<>();
 
+        int cantFindPositionCounter;
+
+        loop:
         for (int i=0; i<numOfDistractors; i++){
+            cantFindPositionCounter = 0;
+
             Rectangle distractor = new Rectangle(shapeSize, shapeSize); //so shapeSize is diameter, not radius
 
             distractor.setFill(javafx.scene.paint.Color.DODGERBLUE);
@@ -51,6 +56,8 @@ public class Orientation extends GameMode{
             boolean intersection = true;
 
             while(intersection){
+                cantFindPositionCounter++;
+
                 distractor.setX(rand.nextInt(levelDimensionX-shapeSize));  //we don't need + shapeSize/2 here, because rectangles get drawn from their top left corner
                 distractor.setY(rand.nextInt(levelDimensionY-shapeSize));  //we don't need + shapeSize/2 here, because rectangles get drawn from their top left corner
 
@@ -68,6 +75,8 @@ public class Orientation extends GameMode{
                         }
                     }
                 }
+
+                if(cantFindPositionCounter >= 100) break loop;   //if random grouping position can't be found for 100 times then the loop gets terminated, as no available spots seem to exist anymore
             }
 
             if(randomRotationTarget==0) {

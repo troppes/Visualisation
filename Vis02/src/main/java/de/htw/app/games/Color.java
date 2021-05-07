@@ -56,7 +56,12 @@ public class Color extends GameMode{
 
         ArrayList<Shape> distractors = new ArrayList<>();
 
+        int cantFindPositionCounter;
+
+        loop:
         for (int i=0; i<numOfDistractors; i++){
+            cantFindPositionCounter = 0;
+
             Shape distractor;
             if(randomShape == 0){
                 distractor = new Circle(shapeSize/2.0); //so shapeSize is diameter, not radius
@@ -71,6 +76,8 @@ public class Color extends GameMode{
             boolean intersection = true;
 
             while(intersection){
+                cantFindPositionCounter++;
+
                 if(randomShape == 0){
                     ((Circle)distractor).setCenterX(rand.nextInt(levelDimensionX-shapeSize) + shapeSize/2.0);
                     ((Circle)distractor).setCenterY(rand.nextInt(levelDimensionY-shapeSize) + shapeSize/2.0);
@@ -94,6 +101,8 @@ public class Color extends GameMode{
                         }
                     }
                 }
+
+                if(cantFindPositionCounter >= 100) break loop;   //if random grouping position can't be found for 100 times then the loop gets terminated, as no available spots seem to exist anymore
             }
 
             distractors.add(distractor);
