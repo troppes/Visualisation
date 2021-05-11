@@ -7,11 +7,16 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -120,6 +125,10 @@ public class Vis02 extends Application {
         bottomBox.getChildren().addAll(startPromptButton, skipPromptButton);
         root.setBottom(bottomBox);
 
+        //ToDo: Remove this whole button
+        Button jumpToGraphsButton = new Button("Str8 to Graphs");
+        jumpToGraphsButton.setOnAction(event -> jumpToGraphs());
+        root.setRight(jumpToGraphsButton);
 
         switch (gameModeCounter) {
             case 0: //Color
@@ -326,6 +335,11 @@ public class Vis02 extends Application {
         headingBox.getChildren().addAll(finish, finishRecord, meanTimeLabel, meanDistanceLabel);
         headingBox.setAlignment(Pos.CENTER);
         root.setCenter(headingBox);
+
+
+        List<GameMode> gameModes = ConnectionManager.GETRequest("https://cms.reitz.dev/items/vis02_game_mode/?fields=id,distractors,game_mode,lowest_time", GameMode.class);
+
+        root.setLeft(generateAverageTimes(gameModes));
     }
 
     TableView<Player> generatePlayerTable(List<Player> players) {
@@ -359,6 +373,114 @@ public class Vis02 extends Application {
         tableView.scrollTo(players.indexOf(player));
 
         return tableView;
+    }
+
+    BarChart<String, Number> generateAverageTimes(List<GameMode> gameModes){
+        final CategoryAxis xAxis = new CategoryAxis();
+        final NumberAxis yAxis = new NumberAxis();
+        final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
+        barChart.setTitle("Average time per prompt");
+
+        barChart.setMaxHeight(300);
+        barChart.setCategoryGap(50);
+
+        float[] averageTimes = new float[8];
+
+        for(int i=0; i<gameModes.size(); i+=totalGameModes) {
+            for (int j = 0; j < totalGameModes; j++) {
+                averageTimes[j] += gameModes.get(i+j).getLowestTime();
+            }
+        }
+
+        for(int i=0; i<totalGameModes; i++){
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            switch(i){
+                case 0:
+                    series.setName("Color w/ no distractors");
+                    break;
+                case 1:
+                    series.setName("Orientation w/ no distractors");
+                    break;
+                case 2:
+                    series.setName("Size w/ no distractors");
+                    break;
+                case 3:
+                    series.setName("Grouping w/ no distractors");
+                    break;
+                case 4:
+                    series.setName("Color w/ orientation and size");
+                    break;
+                case 5:
+                    series.setName("Orientation w/ color and size");
+                    break;
+                case 6:
+                    series.setName("Size w/ color and orientation");
+                    break;
+                case 7:
+                    series.setName("Grouping w/ color, orientation and size");
+                    break;
+            }
+
+            series.getData().add(new XYChart.Data<>("Average", averageTimes[i]));
+            series.getData().add(new XYChart.Data<>("Your score", playedGameModes.get(i).getLowestTime()));;
+
+            barChart.getData().add(series);
+        }
+
+        return barChart;
+
+    }
+
+    //ToDo: remove this method
+    void jumpToGraphs(){
+        ArrayList<GameMode> gameModes = new ArrayList<>();
+
+        for(int i=0; i<totalGameModes; i++){
+            GameMode gameMode = null;
+
+            switch (i) {
+                case 0: //Color
+                    gameMode = new Color(levelDimensionX, levelDimensionY);
+                    break;
+                case 1: //Orientation
+                    gameMode = new Orientation(levelDimensionX, levelDimensionY);
+                    break;
+                case 2: //Size
+                    gameMode = new Size(levelDimensionX, levelDimensionY);
+                    break;
+                case 3: //Grouping
+                    gameMode = new Grouping(levelDimensionX, levelDimensionY);
+                    break;
+                case 4: //Color + Orientation, Size
+                    gameMode = new Color(levelDimensionX, levelDimensionY);
+                    gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE});
+                    break;
+                case 5: //Orientation + Size, Color
+                    gameMode = new Orientation(levelDimensionX, levelDimensionY);
+                    gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.SIZE, GameMode.possibleModes.COLOR});
+                    break;
+                case 6: //Size + Color, Orientation
+                    gameMode = new Size(levelDimensionX, levelDimensionY);
+                    gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION});
+                    break;
+                case 7: //Grouping + Color, Orientation, Size
+                    gameMode = new Grouping(levelDimensionX, levelDimensionY);
+                    gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE});
+                    break;
+            }
+            gameMode.setLowestTime(250);
+            gameMode.setMeanDistance(40);
+
+            gameModes.add(gameMode);
+        }
+
+        playedGameModes = gameModes;
+
+        player.setGames(gameModes);
+        player.setMeanTime(250);
+        player.setMeanDistance(40);
+
+        finishGame();
     }
 
     public static void main(String[] args) {

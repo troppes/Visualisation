@@ -47,6 +47,8 @@ public abstract class GameMode {
     float meanDistance = 0;
     int distanceCounter = 0;
 
+    public GameMode() {}
+
     public GameMode(int levelDimensionX, int levelDimensionY) {
         this.levelDimensionX = levelDimensionX;
         this.levelDimensionY = levelDimensionY;

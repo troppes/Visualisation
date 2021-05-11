@@ -101,32 +101,33 @@ public class Grouping extends GameMode{
         Random rand = new Random();
         ArrayList<Shape> shapes = new ArrayList<>();
 
+        int cantFindPositionCounter = 0;
+
         //adjusting grouping size, x and Y, so that objects don't go over the groupings borders
-        if(randomShape==0){
-            groupingSize -= shapeSize/2;
-        }
-        else{   //X and Y have to be adjusted, cause Squares get drawn from the upper left corner
-            groupingSize -= shapeSize/2;
-            groupingX -= shapeSize/2;
-            groupingY -= shapeSize/2;
+        if (randomShape == 0) {
+            groupingSize -= shapeSize / 2;
+        } else {   //X and Y have to be adjusted, cause Squares get drawn from the upper left corner
+            groupingSize -= shapeSize / 2;
+            groupingX -= shapeSize / 2;
+            groupingY -= shapeSize / 2;
         }
 
-        for (int i=0; i<groupingNumber; i++) {
+        for (int i = 0; i < groupingNumber; i++) {
             Shape groupingItem;
 
-            if(randomShape == 0){
+            if (randomShape == 0) {
                 groupingItem = new Circle(shapeSize / 2.0); //so shapeSize is diameter, not radius
-            }
-            else {
+            } else {
                 groupingItem = new Rectangle(shapeSize, shapeSize); //so shapeSize is diameter, not radius
             }
 
             groupingItem.setFill(Color.DODGERBLUE);
-            if(randomColor == 0) groupingItem.setFill(Color.CRIMSON);
+            if (randomColor == 0) groupingItem.setFill(Color.CRIMSON);
 
             boolean intersection = true;
 
-            while(intersection){
+            while (intersection) {
+                cantFindPositionCounter++;
 
                 double randomNormalizedValue = rand.nextDouble();
 
@@ -136,13 +137,12 @@ public class Grouping extends GameMode{
                 double x = r * Math.cos(a);
                 double y = r * Math.sin(a);
 
-                if(randomShape == 0){
-                    ((Circle)groupingItem).setCenterX(x + groupingX); //random X position
-                    ((Circle)groupingItem).setCenterY(y + groupingY); //random Y position
-                }
-                else {
-                    ((Rectangle)groupingItem).setX(x + groupingX); //random X position
-                    ((Rectangle)groupingItem).setY(y + groupingY); //random Y position
+                if (randomShape == 0) {
+                    ((Circle) groupingItem).setCenterX(x + groupingX); //random X position
+                    ((Circle) groupingItem).setCenterY(y + groupingY); //random Y position
+                } else {
+                    ((Rectangle) groupingItem).setX(x + groupingX); //random X position
+                    ((Rectangle) groupingItem).setY(y + groupingY); //random Y position
                 }
 
                 intersection = false;
@@ -154,6 +154,8 @@ public class Grouping extends GameMode{
                         break;
                     }
                 }
+
+                if(cantFindPositionCounter >= 100) return generateGroupingElements(groupingNumber, randomShape, randomColor, groupingSize,  groupingX, groupingY);
             }
 
             shapes.add(groupingItem);
