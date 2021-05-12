@@ -335,7 +335,7 @@ public class Vis02 extends Application {
         meanDistanceLabel.setFont(new Font("Arial", 20));
 
         VBox headingBox = new VBox();
-        headingBox.getChildren().addAll(finish, finishRecord, meanTimeLabel, meanDistanceLabel);
+        headingBox.getChildren().addAll(finish/*, finishRecord*/, meanTimeLabel, meanDistanceLabel);
         headingBox.setAlignment(Pos.CENTER);
         root.setCenter(headingBox);
     }
@@ -406,7 +406,7 @@ public class Vis02 extends Application {
         final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
         barChart.setTitle("Average time per prompt");
 
-        barChart.setMaxHeight(300);
+        barChart.setMaxHeight(280);
         barChart.setCategoryGap(50);
 
         float[] averageTimes = new float[8];
@@ -477,43 +477,39 @@ public class Vis02 extends Application {
             averageTimes[i] = averageTimes[i]/averageTimeCounter[i];
         }
 
-        for(int i=0; i<totalGameModes; i++){
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            switch(i){
-                case 0:
-                    series.setName("Color w/ no distractors");
-                    break;
-                case 1:
-                    series.setName("Orientation w/ no distractors");
-                    break;
-                case 2:
-                    series.setName("Size w/ no distractors");
-                    break;
-                case 3:
-                    series.setName("Grouping w/ no distractors");
-                    break;
-                case 4:
-                    series.setName("Color w/ orientation and size");
-                    break;
-                case 5:
-                    series.setName("Orientation w/ color and size");
-                    break;
-                case 6:
-                    series.setName("Size w/ color and orientation");
-                    break;
-                case 7:
-                    series.setName("Grouping w/ color, orientation and size");
-                    break;
-            }
+        XYChart.Series<String, Number> averageSeries = new XYChart.Series<>();
+        XYChart.Series<String, Number> playerSeries = new XYChart.Series<>();
 
-            series.getData().add(new XYChart.Data<>("Average", averageTimes[i]));
-            series.getData().add(new XYChart.Data<>("Your score", playedGameModes.get(i).getLowestTime()));;
+        playerSeries.setName("Your Score");
+        averageSeries.setName("Average");
 
-            barChart.getData().add(series);
-        }
+        playerSeries.getData().add(new XYChart.Data<>("Color w/ \nno distractors", playedGameModes.get(0).getLowestTime()));
+        averageSeries.getData().add(new XYChart.Data<>("Color w/ \nno distractors", averageTimes[0]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Size w/ \nno distractors", playedGameModes.get(1).getLowestTime()));
+        averageSeries.getData().add(new XYChart.Data<>("Size w/ \nno distractors", averageTimes[1]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Orientation w/ \nno distractors", playedGameModes.get(2).getLowestTime()));
+        averageSeries.getData().add(new XYChart.Data<>("Orientation w/ \nno distractors", averageTimes[2]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Grouping w/ \nno distractors", playedGameModes.get(3).getLowestTime()));
+        averageSeries.getData().add(new XYChart.Data<>("Grouping w/ \nno distractors", averageTimes[3]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Color w/ \norientation and size", playedGameModes.get(4).getLowestTime()));
+        averageSeries.getData().add(new XYChart.Data<>("Color w/ \norientation and size", averageTimes[4]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Size w/ \ncolor and size", playedGameModes.get(5).getLowestTime()));
+        averageSeries.getData().add(new XYChart.Data<>("Size w/ \ncolor and size", averageTimes[5]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Orientation w/ \ncolor and orientation", playedGameModes.get(6).getLowestTime()));
+        averageSeries.getData().add(new XYChart.Data<>("Orientation w/ \ncolor and orientation", averageTimes[6]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Grouping w/ \ncolor, orientation and size", playedGameModes.get(7).getLowestTime()));
+        averageSeries.getData().add(new XYChart.Data<>("Grouping w/ \ncolor, orientation and size", averageTimes[7]));
+
+        barChart.getData().addAll(playerSeries, averageSeries);
 
         return barChart;
-
     }
 
     BarChart<String, Number> generateDistanceChart(List<GameMode> gameModes){
@@ -522,7 +518,7 @@ public class Vis02 extends Application {
         final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
         barChart.setTitle("Average distance per prompt");
 
-        barChart.setMaxHeight(300);
+        barChart.setMaxHeight(280);
         barChart.setCategoryGap(50);
 
         float[] averageDistances = new float[8];
@@ -561,40 +557,37 @@ public class Vis02 extends Application {
             averageDistances[i] = averageDistances[i]/distanceCounter[i];
         }
 
-        for(int i=0; i<totalGameModes; i++){
-            XYChart.Series<String, Number> series = new XYChart.Series<>();
-            switch(i){
-                case 0:
-                    series.setName("Color w/ no distractors");
-                    break;
-                case 1:
-                    series.setName("Orientation w/ no distractors");
-                    break;
-                case 2:
-                    series.setName("Size w/ no distractors");
-                    break;
-                case 3:
-                    series.setName("Grouping w/ no distractors");
-                    break;
-                case 4:
-                    series.setName("Color w/ orientation and size");
-                    break;
-                case 5:
-                    series.setName("Orientation w/ color and size");
-                    break;
-                case 6:
-                    series.setName("Size w/ color and orientation");
-                    break;
-                case 7:
-                    series.setName("Grouping w/ color, orientation and size");
-                    break;
-            }
+        XYChart.Series<String, Number> averageSeries = new XYChart.Series<>();
+        XYChart.Series<String, Number> playerSeries = new XYChart.Series<>();
 
-            series.getData().add(new XYChart.Data<>("Average", averageDistances[i]));
-            series.getData().add(new XYChart.Data<>("Your score", playedGameModes.get(i).getMeanDistance()));;
+        playerSeries.setName("Your Score");
+        averageSeries.setName("Average");
 
-            barChart.getData().add(series);
-        }
+        playerSeries.getData().add(new XYChart.Data<>("Color w/ \nno distractors", playedGameModes.get(0).getMeanDistance()));
+        averageSeries.getData().add(new XYChart.Data<>("Color w/ \nno distractors", averageDistances[0]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Size w/ \nno distractors", playedGameModes.get(1).getMeanDistance()));
+        averageSeries.getData().add(new XYChart.Data<>("Size w/ \nno distractors", averageDistances[1]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Orientation w/ \nno distractors", playedGameModes.get(2).getMeanDistance()));
+        averageSeries.getData().add(new XYChart.Data<>("Orientation w/ \nno distractors", averageDistances[2]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Grouping w/ \nno distractors", playedGameModes.get(3).getMeanDistance()));
+        averageSeries.getData().add(new XYChart.Data<>("Grouping w/ \nno distractors", averageDistances[3]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Color w/ \norientation and size", playedGameModes.get(4).getMeanDistance()));
+        averageSeries.getData().add(new XYChart.Data<>("Color w/ \norientation and size", averageDistances[4]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Size w/ \ncolor and size", playedGameModes.get(5).getMeanDistance()));
+        averageSeries.getData().add(new XYChart.Data<>("Size w/ \ncolor and size", averageDistances[5]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Orientation w/ \ncolor and orientation", playedGameModes.get(6).getMeanDistance()));
+        averageSeries.getData().add(new XYChart.Data<>("Orientation w/ \ncolor and orientation", averageDistances[6]));
+
+        playerSeries.getData().add(new XYChart.Data<>("Grouping w/ \ncolor, orientation and size", playedGameModes.get(7).getMeanDistance()));
+        averageSeries.getData().add(new XYChart.Data<>("Grouping w/ \ncolor, orientation and size", averageDistances[7]));
+
+        barChart.getData().addAll(playerSeries, averageSeries);
 
         return barChart;
 
