@@ -21,6 +21,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.util.*;
 
 public class Vis02 extends Application {
@@ -95,8 +96,8 @@ public class Vis02 extends Application {
 
 
         scene.addEventHandler(KeyEvent.KEY_PRESSED, (key) -> {
-            if (key.getCode() == KeyCode.W) {
-                finishGame();
+            if (key.getCode() == KeyCode.Z) {
+                jumpToGraphs();
             }
         });
 
@@ -123,11 +124,6 @@ public class Vis02 extends Application {
         bottomBox.setAlignment(Pos.CENTER);
         bottomBox.getChildren().addAll(startPromptButton, skipPromptButton);
         root.setBottom(bottomBox);
-
-        //ToDo: Remove this whole button
-        Button jumpToGraphsButton = new Button("Str8 to Graphs");
-        jumpToGraphsButton.setOnAction(event -> jumpToGraphs());
-        root.setRight(jumpToGraphsButton);
 
         switch (gameModeCounter) {
             case 0: //Color
@@ -284,11 +280,11 @@ public class Vis02 extends Application {
         }
 
         //if last game mode has been played finish game, else reload next round
-        if (gameModeCounter == totalGameModes) finishGame();
+        if (gameModeCounter == totalGameModes) finishGame(true);
         else loadResultScreen(win);
     }
 
-    void finishGame() {
+    void finishGame(boolean sendResults) {
         root.getChildren().clear();
 
         player.setGames(playedGameModes);
@@ -312,11 +308,14 @@ public class Vis02 extends Application {
         }
         player.setMeanTime(meanTime/playedGameModes.size());
 
-//        try {
-//            player.setId(ConnectionManager.POSTRequest("https://cms.reitz.dev/items/vis02_player/", player));
-//        } catch (IOException e) {
-//            System.out.println("Failed to send data!");
-//        }
+        if(sendResults){
+            try {
+                player.setId(ConnectionManager.POSTRequest("https://cms.reitz.dev/items/vis02_player/", player));
+            } catch (IOException e) {
+                System.out.println("Failed to send data!");
+            }
+
+        }
 
         List<Player> players = ConnectionManager.GETRequest("https://cms.reitz.dev/items/vis02_player/?fields=id,name,mean_distance,mean_time", Player.class, false);
         List<GameMode> gameModes = ConnectionManager.GETRequest("https://cms.reitz.dev/items/vis02_game_mode/?fields=id,distractors,game_mode,lowest_time,mean_distance", GameMode.class, true);
@@ -333,8 +332,7 @@ public class Vis02 extends Application {
         //leftPane.setMaxSize(300, 100);
 
         final Label caption = new Label("");
-        caption.setTextFill(javafx.scene.paint.Color.BLACK);
-        caption.setStyle("-fx-font: 12 arial;");
+        caption.getStyleClass().add("tooltip-label");
 
         leftPane.getChildren().addAll(generateMeanPieCharts(caption, gameModes), caption);
 
@@ -351,33 +349,6 @@ public class Vis02 extends Application {
         headingBox.getChildren().addAll(finish/*, finishRecord, meanTimeLabel, meanDistanceLabel*/);
         headingBox.setAlignment(Pos.CENTER);
         root.setCenter(headingBox);
-    }
-
-    private void test(List<GameMode> gameModes) {
-
-        while (gameModes.size() > 0){
-
-            ArrayList<GameMode> singleGamemode = new ArrayList<>();
-            singleGamemode.add(gameModes.remove(0));
-            for (int i = 0; i < gameModes.size(); i++) {
-                if(singleGamemode.get(0).equals(gameModes.get(i))){
-                    singleGamemode.add(gameModes.get(i));
-                }
-            }
-            double average = singleGamemode.stream().mapToDouble(GameMode::getMeanDistance).average().orElse(0.0);
-            double min = singleGamemode.stream().mapToDouble(GameMode::getMeanDistance).min().orElse(0.0);
-            double max = singleGamemode.stream().mapToDouble(GameMode::getMeanDistance).max().orElse(0.0);
-
-            System.out.println(singleGamemode.get(0).getGameMode());
-            System.out.println(Arrays.toString(singleGamemode.get(0).getDistractors()));
-            System.out.println(singleGamemode.get(0).getMeanDistance());
-            System.out.println(singleGamemode.size());
-            System.out.println(average);
-            System.out.println(min);
-            System.out.println(max);
-
-        }
-
     }
 
     TableView<Player> generatePlayerTable(List<Player> players) {
@@ -418,6 +389,7 @@ public class Vis02 extends Application {
         final NumberAxis yAxis = new NumberAxis();
         final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
         barChart.setTitle("Average time per prompt");
+        barChart.getStyleClass().add("average-time");
 
         barChart.setMaxHeight(280);
         barChart.setCategoryGap(50);
@@ -530,6 +502,7 @@ public class Vis02 extends Application {
         final NumberAxis yAxis = new NumberAxis();
         final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
         barChart.setTitle("Average distance per prompt");
+        barChart.getStyleClass().add("average-distance");
 
         barChart.setMaxHeight(280);
         barChart.setCategoryGap(50);
@@ -682,7 +655,6 @@ public class Vis02 extends Application {
         return hbox;
     }
 
-    //ToDo: remove this method
     void jumpToGraphs(){
         ArrayList<GameMode> gameModes = new ArrayList<>();
 
@@ -733,7 +705,7 @@ public class Vis02 extends Application {
         player.setMeanTime(250);
         player.setMeanDistance(40);
 
-        finishGame();
+        finishGame(false);
     }
 
     public static void main(String[] args) {
