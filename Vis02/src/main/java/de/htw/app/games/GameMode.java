@@ -4,19 +4,22 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import javafx.application.Platform;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
-public abstract class GameMode {
+public class GameMode {
+
+    @JsonProperty
+    int id;
+
     //Class Mode/-s
     public enum possibleModes {COLOR, ORIENTATION, SIZE, GROUPING} // Statt SIZE/SHAPE = ROTATION
 
-    @JsonProperty
     possibleModes[] distractors = new possibleModes[0]; //to evade nullpointer Reference
     @JsonProperty("game_mode")
     possibleModes gameMode = null;
@@ -43,11 +46,11 @@ public abstract class GameMode {
 
     //tracking data
     float lowestTime = -1;
-    @JsonProperty("mean_distance")
     float meanDistance = 0;
     int distanceCounter = 0;
 
-    public GameMode() {}
+    public GameMode() {
+    }
 
     public GameMode(int levelDimensionX, int levelDimensionY) {
         this.levelDimensionX = levelDimensionX;
@@ -56,12 +59,14 @@ public abstract class GameMode {
         level.setMaxSize(levelDimensionX, levelDimensionY);
     }
 
-    public abstract void generateLevel();
+    public void generateLevel() {
+    }
 
     public possibleModes getGameMode() {
         return gameMode;
     }
 
+    @JsonGetter("distractors")
     public possibleModes[] getDistractors() {
         return distractors;
     }
@@ -82,9 +87,9 @@ public abstract class GameMode {
 
     @JsonGetter("mean_distance")
     public float getMeanDistance() {
-        if(distanceCounter==0) return -1;
+        if (distanceCounter == 0) return -1;
 
-        return meanDistance/distanceCounter;
+        return meanDistance / distanceCounter;
     }
 
     @JsonSetter("mean_distance")
@@ -106,8 +111,13 @@ public abstract class GameMode {
         return targetY;
     }
 
+    @JsonSetter("distractors")
     public void setDistractors(possibleModes[] distractors) {
-        this.distractors = distractors;
+        if(distractors == null){
+            this.distractors = new possibleModes[]{};
+        } else{
+            this.distractors = distractors;
+        }
     }
 
     void applyModifiers() {
@@ -189,4 +199,27 @@ public abstract class GameMode {
             }
         }
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GameMode gameMode1 = (GameMode) o;
+        return new HashSet<>( Arrays.asList( distractors )).equals(new HashSet<>(Arrays.asList(gameMode1.distractors))) && gameMode == gameMode1.gameMode;
+    }
+
+    public boolean hasSameDistractors(possibleModes[] modes){
+        if(modes == null || distractors == null) return modes == null && distractors == null;
+        if(modes.length == 0 || distractors.length == 0) return modes.length == 0 && distractors.length == 0;
+        return new HashSet<>( Arrays.asList( distractors )).equals(new HashSet<>(Arrays.asList(modes)));
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(gameMode);
+        result = 31 * result + Arrays.hashCode(distractors);
+        return result;
+    }
+
+
 }

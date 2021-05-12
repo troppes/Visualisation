@@ -2,8 +2,11 @@ package de.htw.app;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -67,9 +70,10 @@ public class ConnectionManager {
      * @param url Url for the GET request
      * @param valueType Class of the object for deserialization
      * @param <T> Return Class
+     * @param emptyStringAsNull If set to true, empty strings will be parsed as null
      * @return List of elements from given class
      */
-    public static <T> List<T> GETRequest(String url, Class<T> valueType) {
+    public static <T> List<T> GETRequest(String url, Class<T> valueType, boolean emptyStringAsNull) {
         try {
             URL obj = new URL(url);
             HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -88,6 +92,12 @@ public class ConnectionManager {
                 in.close();
 
                 ObjectMapper mapper = new ObjectMapper();
+                if(emptyStringAsNull){
+                    mapper.configure(DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL, true);
+                    mapper.configure(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT, true);
+                }
+
+
                 return mapper.readValue(response.substring(0, response.length() - 1).substring(8),
                         mapper.getTypeFactory().constructCollectionType(List.class, valueType));
             } else {

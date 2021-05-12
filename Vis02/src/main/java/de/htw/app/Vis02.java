@@ -7,23 +7,18 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
-import java.io.IOException;
 import java.util.*;
 
 public class Vis02 extends Application {
@@ -91,6 +86,8 @@ public class Vis02 extends Application {
         loadGameScreen();
 
         Scene scene = new Scene(root);
+        scene.getStylesheets().add("style.css");
+
 
         this.primaryStage = primaryStage;
 
@@ -313,16 +310,22 @@ public class Vis02 extends Application {
         }
         player.setMeanTime(meanTime/playedGameModes.size());
 
-        try {
-            player.setId(ConnectionManager.POSTRequest("https://cms.reitz.dev/items/vis02_player/", player));
-        } catch (IOException e) {
-            System.out.println("Failed to send data!");
-        }
+//        try {
+//            player.setId(ConnectionManager.POSTRequest("https://cms.reitz.dev/items/vis02_player/", player));
+//        } catch (IOException e) {
+//            System.out.println("Failed to send data!");
+//        }
 
-        List<Player> players = ConnectionManager.GETRequest("https://cms.reitz.dev/items/vis02_player/?fields=id,name,mean_distance,mean_time", Player.class);
+        List<Player> players = ConnectionManager.GETRequest("https://cms.reitz.dev/items/vis02_player/?fields=id,name,mean_distance,mean_time", Player.class, false);
+        List<GameMode> gameModes = ConnectionManager.GETRequest("https://cms.reitz.dev/items/vis02_game_mode/?fields=id,distractors,game_mode,lowest_time,mean_distance", GameMode.class, true);
 
         assert players != null;
         root.setRight(generatePlayerTable(players));
+
+
+        assert gameModes != null;
+        root.setTop(generateAverageTimes(gameModes));
+        root.setBottom(generateDistanceChart(gameModes));
 
         Label finishRecord = new Label("Times:\n" + recordString);
         Label meanTimeLabel = new Label("Mean Time: " + player.getMeanTime()+"ms");
@@ -335,11 +338,33 @@ public class Vis02 extends Application {
         headingBox.getChildren().addAll(finish, finishRecord, meanTimeLabel, meanDistanceLabel);
         headingBox.setAlignment(Pos.CENTER);
         root.setCenter(headingBox);
+    }
 
+    private void test(List<GameMode> gameModes) {
 
-        List<GameMode> gameModes = ConnectionManager.GETRequest("https://cms.reitz.dev/items/vis02_game_mode/?fields=id,distractors,game_mode,lowest_time", GameMode.class);
+        while (gameModes.size() > 0){
 
-        root.setLeft(generateAverageTimes(gameModes));
+            ArrayList<GameMode> singleGamemode = new ArrayList<>();
+            singleGamemode.add(gameModes.remove(0));
+            for (int i = 0; i < gameModes.size(); i++) {
+                if(singleGamemode.get(0).equals(gameModes.get(i))){
+                    singleGamemode.add(gameModes.get(i));
+                }
+            }
+            double average = singleGamemode.stream().mapToDouble(GameMode::getMeanDistance).average().orElse(0.0);
+            double min = singleGamemode.stream().mapToDouble(GameMode::getMeanDistance).min().orElse(0.0);
+            double max = singleGamemode.stream().mapToDouble(GameMode::getMeanDistance).max().orElse(0.0);
+
+            System.out.println(singleGamemode.get(0).getGameMode());
+            System.out.println(Arrays.toString(singleGamemode.get(0).getDistractors()));
+            System.out.println(singleGamemode.get(0).getMeanDistance());
+            System.out.println(singleGamemode.size());
+            System.out.println(average);
+            System.out.println(min);
+            System.out.println(max);
+
+        }
+
     }
 
     TableView<Player> generatePlayerTable(List<Player> players) {
@@ -385,11 +410,71 @@ public class Vis02 extends Application {
         barChart.setCategoryGap(50);
 
         float[] averageTimes = new float[8];
+        int[] averageTimeCounter = new int[8];
 
-        for(int i=0; i<gameModes.size(); i+=totalGameModes) {
-            for (int j = 0; j < totalGameModes; j++) {
-                averageTimes[j] += gameModes.get(i+j).getLowestTime();
+        for (GameMode gameMode: gameModes) {
+            if(GameMode.possibleModes.COLOR == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{})){
+                if(gameMode.getLowestTime() == -1){
+                    averageTimes[0] += 2000;
+                }else{
+                    averageTimes[0] += gameMode.getLowestTime();
+                }
+                averageTimeCounter[0] += 1;
+            } else if(GameMode.possibleModes.ORIENTATION == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{})) {
+                if(gameMode.getLowestTime() == -1){
+                    averageTimes[1] += 2000;
+                }else{
+                    averageTimes[1] += gameMode.getLowestTime();
+                }
+                averageTimeCounter[1] += 1;
+            }else if(GameMode.possibleModes.SIZE == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{})) {
+                if(gameMode.getLowestTime() == -1){
+                    averageTimes[2] += 2000;
+                }else{
+                    averageTimes[2] += gameMode.getLowestTime();
+                }
+                averageTimeCounter[2] += 1;
+            }else if(GameMode.possibleModes.GROUPING == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{})){
+                if(gameMode.getLowestTime() == -1){
+                    averageTimes[3] += 2000;
+                }else{
+                    averageTimes[3] += gameMode.getLowestTime();
+                }
+                averageTimeCounter[3] += 1;
+            }else if(GameMode.possibleModes.COLOR == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE})){
+                if(gameMode.getLowestTime() == -1){
+                    averageTimes[4] += 2000;
+                }else{
+                    averageTimes[4] += gameMode.getLowestTime();
+                }
+                averageTimeCounter[4] += 1;
+            }else if(GameMode.possibleModes.ORIENTATION == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.SIZE})){
+                if(gameMode.getLowestTime() == -1){
+                    averageTimes[5] += 2000;
+                }else{
+                    averageTimes[5] += gameMode.getLowestTime();
+                }
+                averageTimeCounter[5] += 1;
+            }else if(GameMode.possibleModes.SIZE == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION})){
+                if(gameMode.getLowestTime() == -1){
+                    averageTimes[6] += 2000;
+                }else{
+                    averageTimes[6] += gameMode.getLowestTime();
+                }
+                averageTimeCounter[6] += 1;
+            }else if(GameMode.possibleModes.GROUPING == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE})){
+                if(gameMode.getLowestTime() == -1){
+                    averageTimes[7] += 2000;
+                }else{
+                    averageTimes[7] += gameMode.getLowestTime();
+                }
+                averageTimeCounter[7] += 1;
             }
+        }
+
+        for(int i = 0; i < averageTimeCounter.length; i++){
+            if(averageTimeCounter[i] == 0) averageTimes[i] = 0.0F;
+            averageTimes[i] = averageTimes[i]/averageTimeCounter[i];
         }
 
         for(int i=0; i<totalGameModes; i++){
@@ -431,6 +516,91 @@ public class Vis02 extends Application {
 
     }
 
+    BarChart<String, Number> generateDistanceChart(List<GameMode> gameModes){
+        final CategoryAxis xAxis = new CategoryAxis();
+        final NumberAxis yAxis = new NumberAxis();
+        final BarChart<String,Number> barChart = new BarChart<>(xAxis,yAxis);
+        barChart.setTitle("Average distance per prompt");
+
+        barChart.setMaxHeight(300);
+        barChart.setCategoryGap(50);
+
+        float[] averageDistances = new float[8];
+        int[] distanceCounter = new int[8];
+
+        for (GameMode gameMode: gameModes) {
+            if(GameMode.possibleModes.COLOR == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{})){
+                distanceCounter[0] += 1;
+                averageDistances[0] += gameMode.getMeanDistance();
+            } else if(GameMode.possibleModes.ORIENTATION == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{})) {
+                distanceCounter[1] += 1;
+                averageDistances[1] += gameMode.getMeanDistance();
+            }else if(GameMode.possibleModes.SIZE == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{})) {
+                distanceCounter[2] += 1;
+                averageDistances[2] += gameMode.getMeanDistance();
+            }else if(GameMode.possibleModes.GROUPING == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{})){
+                distanceCounter[3] += 1;
+                averageDistances[3] += gameMode.getMeanDistance();
+            }else if(GameMode.possibleModes.COLOR == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE})){
+                distanceCounter[4] += 1;
+                averageDistances[4] += gameMode.getMeanDistance();
+            }else if(GameMode.possibleModes.ORIENTATION == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.SIZE})){
+                distanceCounter[5] += 1;
+                averageDistances[5] += gameMode.getMeanDistance();
+            }else if(GameMode.possibleModes.SIZE == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION})){
+                distanceCounter[6] += 1;
+                averageDistances[6] += gameMode.getMeanDistance();
+            }else if(GameMode.possibleModes.GROUPING == gameMode.getGameMode() && gameMode.hasSameDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE})){
+                distanceCounter[7] += 1;
+                averageDistances[7] += gameMode.getMeanDistance();
+            }
+        }
+
+        for(int i = 0; i < distanceCounter.length; i++){
+            if(distanceCounter[i] == 0) averageDistances[i] = 0.0F;
+            averageDistances[i] = averageDistances[i]/distanceCounter[i];
+        }
+
+        for(int i=0; i<totalGameModes; i++){
+            XYChart.Series<String, Number> series = new XYChart.Series<>();
+            switch(i){
+                case 0:
+                    series.setName("Color w/ no distractors");
+                    break;
+                case 1:
+                    series.setName("Orientation w/ no distractors");
+                    break;
+                case 2:
+                    series.setName("Size w/ no distractors");
+                    break;
+                case 3:
+                    series.setName("Grouping w/ no distractors");
+                    break;
+                case 4:
+                    series.setName("Color w/ orientation and size");
+                    break;
+                case 5:
+                    series.setName("Orientation w/ color and size");
+                    break;
+                case 6:
+                    series.setName("Size w/ color and orientation");
+                    break;
+                case 7:
+                    series.setName("Grouping w/ color, orientation and size");
+                    break;
+            }
+
+            series.getData().add(new XYChart.Data<>("Average", averageDistances[i]));
+            series.getData().add(new XYChart.Data<>("Your score", playedGameModes.get(i).getMeanDistance()));;
+
+            barChart.getData().add(series);
+        }
+
+        return barChart;
+
+    }
+
+
     //ToDo: remove this method
     void jumpToGraphs(){
         ArrayList<GameMode> gameModes = new ArrayList<>();
@@ -468,6 +638,8 @@ public class Vis02 extends Application {
                     gameMode.setDistractors(new GameMode.possibleModes[]{GameMode.possibleModes.COLOR, GameMode.possibleModes.ORIENTATION, GameMode.possibleModes.SIZE});
                     break;
             }
+
+            assert gameMode != null;
             gameMode.setLowestTime(250);
             gameMode.setMeanDistance(40);
 
