@@ -5,6 +5,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
@@ -12,6 +13,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
@@ -327,6 +329,17 @@ public class Vis02 extends Application {
         root.setTop(generateAverageTimes(gameModes));
         root.setBottom(generateDistanceChart(gameModes));
 
+        Pane leftPane = new Pane();
+        //leftPane.setMaxSize(300, 100);
+
+        final Label caption = new Label("");
+        caption.setTextFill(javafx.scene.paint.Color.BLACK);
+        caption.setStyle("-fx-font: 12 arial;");
+
+        leftPane.getChildren().addAll(generateMeanPieCharts(caption, gameModes), caption);
+
+        root.setLeft(leftPane);
+
         Label finishRecord = new Label("Times:\n" + recordString);
         Label meanTimeLabel = new Label("Mean Time: " + player.getMeanTime()+"ms");
         Label meanDistanceLabel = new Label("Mean Distance: " + player.getMeanDistance()+"px");
@@ -335,7 +348,7 @@ public class Vis02 extends Application {
         meanDistanceLabel.setFont(new Font("Arial", 20));
 
         VBox headingBox = new VBox();
-        headingBox.getChildren().addAll(finish/*, finishRecord*/, meanTimeLabel, meanDistanceLabel);
+        headingBox.getChildren().addAll(finish/*, finishRecord, meanTimeLabel, meanDistanceLabel*/);
         headingBox.setAlignment(Pos.CENTER);
         root.setCenter(headingBox);
     }
@@ -593,6 +606,81 @@ public class Vis02 extends Application {
 
     }
 
+    HBox generateMeanPieCharts(Label caption, List<GameMode> gameModes){
+        //time
+        float averageTotalTime = 0;
+        int averageTimeCounter = 0;
+
+        for (GameMode gameMode: gameModes) {
+            if(gameMode.getLowestTime() == -1){
+                averageTotalTime += 2000;
+            }else{
+                averageTotalTime += gameMode.getLowestTime();
+            }
+            averageTimeCounter += 1;
+        }
+
+        averageTotalTime/=averageTimeCounter;
+
+        //distance
+        float averageTotalDistance = 0;
+        int averageDistanceCounter = 0;
+
+        for (GameMode gameMode: gameModes) {
+            if(gameMode.getLowestTime() == -1){
+                averageTotalDistance += 2000;
+            }else{
+                averageTotalDistance += gameMode.getLowestTime();
+            }
+            averageDistanceCounter += 1;
+        }
+
+        averageTotalDistance/=averageDistanceCounter;
+
+        HBox hbox = new HBox();
+
+        ObservableList<PieChart.Data> pieChartData =
+                FXCollections.observableArrayList(
+                        new PieChart.Data("Your average", (int)player.getMeanTime()),   //cast to int to eradicate everything after the comma
+                        new PieChart.Data("Total average", (int)averageTotalTime));   //cast to int to eradicate everything after the comma
+        PieChart chart = new PieChart(pieChartData);
+        chart.setTitle("Total average time");
+        chart.setMaxSize(50, 50);
+
+        //click show data
+        for (PieChart.Data data : chart.getData()) {
+            data.getNode().addEventHandler(MouseEvent.MOUSE_PRESSED,
+                    e -> {
+                        caption.setTranslateX(e.getSceneX());
+                        caption.setTranslateY(e.getY() + 80);
+                        caption.setText(data.getPieValue() + " pixel");
+                    });
+        }
+
+        hbox.getChildren().add(chart);
+
+        pieChartData =
+                FXCollections.observableArrayList(
+                        new PieChart.Data("Your average", (int)player.getMeanDistance()),   //cast to int to eradicate everything after the comma
+                        new PieChart.Data("Total average", (int)averageTotalDistance));   //cast to int to eradicate everything after the comma
+        chart = new PieChart(pieChartData);
+        chart.setTitle("Total average distance");
+        chart.setMaxSize(50, 50);
+
+        //click show data
+        for (PieChart.Data data : chart.getData()) {
+            data.getNode().addEventHandler(MouseEvent.MOUSE_PRESSED,
+                    e -> {
+                        caption.setTranslateX(e.getSceneX());
+                        caption.setTranslateY(e.getY() + 80);
+                        caption.setText(data.getPieValue() + " pixel");
+                    });
+        }
+
+        hbox.getChildren().add(chart);
+
+        return hbox;
+    }
 
     //ToDo: remove this method
     void jumpToGraphs(){
