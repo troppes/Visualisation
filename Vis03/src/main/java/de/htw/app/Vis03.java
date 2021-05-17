@@ -19,9 +19,9 @@ public class Vis03 extends Application {
         List<Car> cars = ConnectionManager.loadCSV("https://home.htw-berlin.de/~jungk/vis_ss21/ue03/cars.txt", Car.class,'\t');
 
 
-        HBox testOutput = new HBox();
+        VBox testOutput = new VBox();
         for(int i = 0; i < 10; i++){
-            testOutput.getChildren().add(new Label(cars.get(i).getName()));
+            testOutput.getChildren().add(new Label("Name: "+cars.get(i).getName()+" MPG: "+cars.get(i).getMpg()+" KML: "+cars.get(i).getKml()));
         }
 
         root = new BorderPane();
