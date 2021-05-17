@@ -1,4 +1,4 @@
-package de.htw.app.deserializer;
+package de.htw.app.lib.deserializer;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;

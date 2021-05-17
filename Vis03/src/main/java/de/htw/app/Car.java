@@ -3,7 +3,7 @@ package de.htw.app;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import de.htw.app.deserializer.DoubleDeserializer;
+import de.htw.app.lib.deserializer.DoubleDeserializer;
 
 
 @JsonPropertyOrder({
