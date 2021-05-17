@@ -24,7 +24,7 @@ public class ConnectionManager {
      * @return The id of the posted object
      * @throws IOException If the object cant be sent
      */
-    public static int POSTRequest(String url, Player go) throws IOException {
+    public static int POSTRequest(String url, Object go) throws IOException {
 
         url += "?fields=id";
         ObjectMapper objectMapper = new ObjectMapper();
