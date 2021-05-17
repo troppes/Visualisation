@@ -9,7 +9,7 @@ import de.htw.app.lib.deserializer.DoubleDeserializer;
 @JsonPropertyOrder({
         "name",
         "manufacturer",
-        "mpg",
+        "consumption",
         "cylinder",
         "displacement",
         "horsepower",
@@ -25,7 +25,7 @@ public class Car {
     private String manufacturer;
     @JsonProperty
     @JsonDeserialize(using = DoubleDeserializer.class)
-    private Double mpg;
+    private Double consumption;
     @JsonProperty
     private Integer cylinder;
     @JsonProperty
@@ -53,39 +53,30 @@ public class Car {
         return manufacturer;
     }
 
-    public Double getMpg() {
-        return mpg;
-    }
-
-    public Double getKml() {
-        if(mpg == null) return null;
-        return mpg/2.3521458;
+    public Double getConsumption(boolean kml) {
+        if(consumption == null) return null;
+        if(kml) return consumption/2.3521458;
+        return consumption;
     }
 
     public Integer getCylinder() {
         return cylinder;
     }
 
-    public Double getDisplacement() {
-        return displacement;
-    }
-
-    public Double getDisplacementInCCM() {
+    public Double getDisplacement(boolean inCCM) {
         if(displacement == null) return null;
-        return displacement*16.387;
+        if(inCCM) return displacement*16.387;
+        return displacement;
     }
 
     public Double getHorsepower() {
         return horsepower;
     }
 
-    public Double getWeight() {
-        return weight;
-    }
-
-    public Double getWeightInKG() {
+    public Double getWeight(boolean kg) {
         if(weight == null) return null;
-        return weight/2.205;
+        if(kg) return weight/2.205;
+        return weight;
     }
 
     public Double getAcceleration() {
@@ -105,7 +96,7 @@ public class Car {
         return "Car{" +
                 "name='" + name + '\'' +
                 ", manufacturer='" + manufacturer + '\'' +
-                ", mpg=" + mpg +
+                ", consumption=" + consumption +
                 ", cylinder=" + cylinder +
                 ", displacement=" + displacement +
                 ", horsepower=" + horsepower +

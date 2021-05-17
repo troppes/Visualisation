@@ -21,7 +21,7 @@ public class Vis03 extends Application {
 
         VBox testOutput = new VBox();
         for(int i = 0; i < 10; i++){
-            testOutput.getChildren().add(new Label("Name: "+cars.get(i).getName()+" MPG: "+cars.get(i).getMpg()+" KML: "+cars.get(i).getKml()));
+            testOutput.getChildren().add(new Label("Name: "+cars.get(i).getName()+" MPG: "+cars.get(i).getConsumption(false)+" KML: "+cars.get(i).getConsumption(true)));
         }
 
         root = new BorderPane();
