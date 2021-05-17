@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/CircleGame/Vis01.iml" filepath="$PROJECT_DIR$/CircleGame/Vis01.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Vis01/Vis01.iml" filepath="$PROJECT_DIR$/Vis01/Vis01.iml" />
       <module fileurl="file://$PROJECT_DIR$/Vis02/Vis02.iml" filepath="$PROJECT_DIR$/Vis02/Vis02.iml" />
       <module fileurl="file://$PROJECT_DIR$/Vis03/Vis03.iml" filepath="$PROJECT_DIR$/Vis03/Vis03.iml" />
       <module fileurl="file://$PROJECT_DIR$/Visualisation.iml" filepath="$PROJECT_DIR$/Visualisation.iml" />
