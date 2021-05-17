@@ -29,7 +29,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class CircleGame extends Application {
+public class Vis01 extends Application {
 
     //Game UI
     Button bigPlusButton, plusButton, minusButton, bigMinusButton;
