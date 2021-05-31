@@ -6,7 +6,6 @@ import de.htw.app.model.Car;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -101,9 +100,9 @@ public class Vis03 extends Application {
         });
 
         //root.setTop(imageView);
-        ScatterChart scatterChart = new ScatterChart(cars, logos, 500, 500);
+        ScatterChart scatterChart = new ScatterChart(cars, logos, 800, 500);
 
-        root.setTop(scatterChart.getScatterChartPane());
+        root.setTop(scatterChart.getPane());
         root.setBottom(unitsButton);
 
         Scene scene = new Scene(root);

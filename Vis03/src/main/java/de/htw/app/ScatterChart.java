@@ -7,7 +7,9 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.chart.*;
@@ -23,6 +25,7 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import de.htw.app.model.Car;
@@ -42,6 +45,7 @@ public class ScatterChart {
 
     int width, height;
 
+    BorderPane wholeWindow;
     Pane scatterChartPane;
 
     ArrayList<Glyph> allGlyphs = new ArrayList<>();
@@ -51,6 +55,7 @@ public class ScatterChart {
     Map<String, ArrayList<Glyph>> japaneseGlyphs = new HashMap<>();
 
     public ScatterChart(List<Car> cars, List<Logo> logos, int width, int height){
+        wholeWindow = new BorderPane();
         scatterChartPane = new Pane();
         this.width = width;
         this.height = height;
@@ -75,14 +80,22 @@ public class ScatterChart {
                 generateGlyphCoordinates(newValue.toString());
             }
         );
+        HBox hbox = new HBox();
+        hbox.getChildren().add(yAxisDropdown);
+        hbox.setPadding(new Insets(0, 50, 0, 0));
+
+        wholeWindow.setLeft(hbox);
+        wholeWindow.setCenter(scatterChartPane);
+
+        wholeWindow.setPadding(new Insets(20));
+        scatterChartPane.setPadding(new Insets(50));
+        //ToDo: Add Box with all selectable logos
 
         generateGlyphCoordinates("Horsepower");
     }
 
-    public Pane getScatterChartPane() {
-        System.out.println(scatterChartPane.getChildren().size());
-
-        return scatterChartPane;
+    public Pane getPane() {
+        return wholeWindow;
     }
 
     void generateGlyphOriginPairs(){
@@ -125,6 +138,8 @@ public class ScatterChart {
 
     //Change string to the enum Flo created in car
     void generateGlyphCoordinates(String yAxisValue){
+        scatterChartPane.getChildren().clear();
+
         double maxYValue = 0;
         double minYValue = 0;
         double maxXValue = 0;
@@ -175,6 +190,10 @@ public class ScatterChart {
             }
         }
 
+        //to leave a little space to the left and right of the graph
+        maxXValue+=1;
+        minXValue-=1;
+
         //normalize and set position
         for(Glyph glyph : allGlyphs){
             double x = glyph.getCar().getYear();
@@ -211,33 +230,64 @@ public class ScatterChart {
             x=(x-minXValue)/(maxXValue-minXValue)*(width-0)+0;
             if(y>=0) y=(y-minYValue)/(maxYValue-minYValue)*(height-0)+0;   //if y is not null   //ToDo: Reverse y here, as picture is drawn top left to bottom right
             else y=-5000;   //ToDo: Placeholder. Maybe don't display it at all if that's the case
+            y = height - y;
 
             glyph.setPosition(x, y);
         }
 
-        generateChartAxis(yAxisValue);
+        generateChartAxis(minXValue, maxXValue, minYValue, maxYValue);
         drawGlyphs();
     }
 
-    void generateChartAxis(String yAxisValue){
-        Rectangle yAxis = new Rectangle(1, height);
+    void generateChartAxis(double minX, double maxX, double minY, double maxY){
+        Rectangle yAxis = new Rectangle(2, height);
         yAxis.setX(0);
         yAxis.setY(0);
 
-        Rectangle xAxis = new Rectangle(width, 1);
+        Rectangle xAxis = new Rectangle(width, 2);
         xAxis.setX(0);
-        xAxis.setY(width);
+        xAxis.setY(height);
 
         //ToDo: set markers for values in regular distance for each axis
+        //x Axis
+        for(int i=0; i<=8; i++){
+            double xTag = minX + i*(maxX-minX)/8;
+
+            Text t = new Text(i*width/8, height+20, String.valueOf((int)xTag));
+            t.setWrappingWidth(15);
+            t.setTextAlignment(TextAlignment.CENTER);
+            t.setX(i*width/8-t.getWrappingWidth()/2);
+
+            Rectangle marker = new Rectangle(2, 7);
+            marker.setX(i*width/8);
+            marker.setY(height);
+            scatterChartPane.getChildren().add(t);
+            scatterChartPane.getChildren().add(marker);
+        }
+
+        //y Axis
+        for(int i=0; i<=8; i++){
+            double yTag = minY + i*(maxY-minY)/8;
+
+            Text t = new Text(String.valueOf((int)yTag));
+            //t.setWrappingWidth(15);
+            t.setTextAlignment(TextAlignment.CENTER);
+            t.setX(-35);
+            t.setY(height - i*height/8 + 5/*-t.getWrappingHeight()/2*/);  //ToDo: Find a way to get height of these tags
+
+            Rectangle marker = new Rectangle(7, 2);
+            marker.setX(-7);
+            marker.setY(i*height/8);
+            scatterChartPane.getChildren().add(t);
+            scatterChartPane.getChildren().add(marker);
+        }
 
         scatterChartPane.getChildren().add(yAxis);
         scatterChartPane.getChildren().add(xAxis);
     }
 
     void drawGlyphs(){
-        //scatterChartPane.getChildren().clear();   //ToDo: Find a way to clear out the last glyph and bar draws
         for (Map.Entry<String,ArrayList<Glyph>> entry : americanGlyphs.entrySet()){
-            //System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
             for (Glyph glyph : entry.getValue()) {
                 if(glyph.getVisible()){
                     ImageView imageView = addGlyphImageView(glyph);
@@ -247,7 +297,6 @@ public class ScatterChart {
             }
         }
         for (Map.Entry<String,ArrayList<Glyph>> entry : europeanGlyphs.entrySet()){
-            //System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
             for (Glyph glyph : entry.getValue()) {
                 if(glyph.getVisible()){
                     ImageView imageView = addGlyphImageView(glyph);
@@ -257,7 +306,6 @@ public class ScatterChart {
             }
         }
         for (Map.Entry<String,ArrayList<Glyph>> entry : japaneseGlyphs.entrySet()){
-            //System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
             for (Glyph glyph : entry.getValue()) {
                 if(glyph.getVisible()){
                     ImageView imageView = addGlyphImageView(glyph);
@@ -277,13 +325,10 @@ public class ScatterChart {
         imageView.setImage(logo.getImage());
         imageView.setId(logo.getSlug());
         //Setting the image view parameters
-        imageView.setX(glyph.getPosX());
-        imageView.setY(glyph.getPosY());
         imageView.setFitWidth(70);
         imageView.setPreserveRatio(true);
-
-        System.out.println("Glyph X: " + imageView.getX());
-        System.out.println("Glyph Y: " + imageView.getY());
+        imageView.setX(glyph.getPosX() - imageView.getFitWidth()/2);
+        imageView.setY(glyph.getPosY()- imageView.getFitHeight()/2);
 
         ColorAdjust colorAdjust = new ColorAdjust();
         //Setting the saturation value
@@ -307,7 +352,6 @@ public class ScatterChart {
     //call this on click on a whole region
     void changeGlyphVisibilty(Map<String, ArrayList<Glyph>> origin, boolean visibility){
         for (Map.Entry<String,ArrayList<Glyph>> entry : origin.entrySet()){
-            //System.out.println("Key = " + entry.getKey() + ", Value = " + entry.getValue());
             for (Glyph glyph : entry.getValue()) {
                 glyph.setVisible(visibility);
             }
