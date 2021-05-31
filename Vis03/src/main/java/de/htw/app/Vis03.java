@@ -30,6 +30,15 @@ public class Vis03 extends Application {
         Stage detailWindow = new Stage();
 
         List<Car> cars = ConnectionManager.loadCSV("https://home.htw-berlin.de/~jungk/vis_ss21/ue03/cars.txt", Car.class, '\t');
+
+        //ToDo: Remove this block. this was for testing only, as we get null pointer exceptions from missing logos
+            List<Car> testCars = new ArrayList<>();
+            testCars.add(cars.get(0));
+            testCars.add(cars.get(1));
+            testCars.add(cars.get(37));
+
+            cars = testCars;
+
         List<Logo> logos = ConnectionManager.loadJSON("logos/data.json", Logo.class);
 
         assert cars != null;
@@ -37,7 +46,7 @@ public class Vis03 extends Application {
 
         averageCar = new Car();
 
-
+        /*
         ImageView imageView = new ImageView();
 
         Logo logo = logos.stream()
@@ -75,7 +84,7 @@ public class Vis03 extends Application {
             detailWindow.setScene(new Scene(generateDetails(v.getImage(), car, metric), 450, 450));
             detailWindow.show();
         });
-
+        */
 
         root = new BorderPane();
         root.setPrefSize(1280, 720);
@@ -91,7 +100,10 @@ public class Vis03 extends Application {
             }
         });
 
-        root.setTop(imageView);
+        //root.setTop(imageView);
+        ScatterChart scatterChart = new ScatterChart(cars, logos, 500, 500);
+
+        root.setTop(scatterChart.getScatterChartPane());
         root.setBottom(unitsButton);
 
         Scene scene = new Scene(root);
