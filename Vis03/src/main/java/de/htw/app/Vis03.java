@@ -30,9 +30,12 @@ public class Vis03 extends Application {
         List<Car> cars = ConnectionManager.loadCSV("https://home.htw-berlin.de/~jungk/vis_ss21/ue03/cars.txt", Car.class, '\t');
         List<Logo> logos = ConnectionManager.loadJSON("logos/data.json", Logo.class);
 
+        assert cars != null;
+        assert logos != null;
+
 
         ImageView imageView = new ImageView();
-        assert logos != null;
+
         Logo logo = logos.stream()
                 .filter(l -> l.getSlug().equals("amc"))
                 .findFirst()
@@ -57,7 +60,7 @@ public class Vis03 extends Application {
         imageView.setOnMouseClicked(e -> {
             ImageView v = (ImageView) e.getSource();
 
-            assert cars != null;
+
             Car car = cars.stream()
                     .filter(c -> c.getManufacturer().equals(v.getId()))
                     .findFirst()
