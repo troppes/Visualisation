@@ -23,6 +23,8 @@ public class Vis03 extends Application {
     @Override
     public void start(Stage primaryStage) {
 
+        Stage detailWindow = new Stage();
+
         List<Car> cars = ConnectionManager.loadCSV("https://home.htw-berlin.de/~jungk/vis_ss21/ue03/cars.txt", Car.class, '\t');
         List<Logo> logos = ConnectionManager.loadJSON("logos/data.json", Logo.class);
 
@@ -62,15 +64,14 @@ public class Vis03 extends Application {
                     .filter(c -> c.getManufacturer().equals(v.getId()))
                     .findFirst()
                     .orElse(null);
-
-
             assert car != null;
-            System.out.println(car.getName());
+
+
+
             Parent root = new BorderPane();
-            Stage stage = new Stage();
-            stage.setTitle("My New Stage Title");
-            stage.setScene(new Scene(root, 450, 450));
-            stage.show();
+            detailWindow.setTitle(car.getName());
+            detailWindow.setScene(new Scene(root, 450, 450));
+            detailWindow.show();
         });
 
 

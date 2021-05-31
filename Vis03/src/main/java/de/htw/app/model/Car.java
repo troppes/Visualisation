@@ -18,6 +18,17 @@ import de.htw.app.lib.deserializer.DoubleDeserializer;
         "year",
         "origin"
 })
+
+
+enum comparableValues {
+    Consumption,
+    Cylinder,
+    Displacement,
+    Horsepower,
+    Weight,
+    Acceleration
+}
+
 public class Car {
     @JsonProperty
     private String name;
