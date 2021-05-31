@@ -20,16 +20,18 @@ import de.htw.app.lib.deserializer.DoubleDeserializer;
 })
 
 
-enum comparableValues {
-    Consumption,
-    Cylinder,
-    Displacement,
-    Horsepower,
-    Weight,
-    Acceleration
-}
-
 public class Car {
+
+
+    public enum comparableValues {
+        Consumption,
+        Cylinder,
+        Displacement,
+        Horsepower,
+        Weight,
+        Acceleration
+    }
+
     @JsonProperty
     private String name;
     @JsonProperty
