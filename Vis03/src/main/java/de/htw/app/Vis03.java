@@ -35,7 +35,7 @@ public class Vis03 extends Application {
         assert cars != null;
         assert logos != null;
 
-        averageCar = new Car();
+        averageCar = new Car(); // Todo build averagecar
 
 
         ImageView imageView = new ImageView();
@@ -72,7 +72,7 @@ public class Vis03 extends Application {
             assert car != null;
 
             detailWindow.setTitle(car.getName());
-            detailWindow.setScene(new Scene(generateDetails(v.getImage(), car, metric), 450, 450));
+            detailWindow.setScene(new Scene(generateDetails(v.getImage(), car, averageCar, metric), 450, 450));
             detailWindow.show();
         });
 
@@ -105,7 +105,7 @@ public class Vis03 extends Application {
         primaryStage.show();
     }
 
-    GridPane generateDetails(Image manufacturer, Car car, boolean metric) {
+    GridPane generateDetails(Image manufacturer, Car car, Car averageCar, boolean metric) {
         GridPane pane = new GridPane();
         pane.setHgap(10); // set gap in pixels
 
