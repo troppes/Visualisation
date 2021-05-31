@@ -113,7 +113,7 @@ public class Vis03 extends Application {
         this.primaryStage = primaryStage;
 
         primaryStage.setScene(scene);
-        primaryStage.setTitle("Find Waldo: Reaction Edition");
+        primaryStage.setTitle("Autobahn Auto fahren - Extended Deluxe Edition");
         primaryStage.show();
     }
 
