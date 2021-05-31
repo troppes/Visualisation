@@ -5,13 +5,12 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.*;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import de.htw.app.model.Logo;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ConnectionManager {
@@ -145,6 +144,33 @@ public class ConnectionManager {
                 throw new IOException("Get Request for the GameObjects failed!");
             }
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @param path Path to the JSON
+     * @param valueType Class of the object for deserialization
+     * @param <T> Return Class
+     * @return List of elements from given class
+     */
+    public static <T> List<T> loadJSON(String path, Class<T> valueType) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            InputStream is = ConnectionManager.class.getClassLoader().getResourceAsStream(path);
+            JsonNode json = mapper.readTree(is);
+
+            List<T> list = new ArrayList<>();
+            for (JsonNode node : json) {
+                list.add(mapper.treeToValue(node, valueType));
+            }
+
+            return list;
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
