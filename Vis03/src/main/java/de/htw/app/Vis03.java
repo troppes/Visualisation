@@ -22,6 +22,8 @@ public class Vis03 extends Application {
 
     Boolean metric = false;
 
+    Car averageCar;
+
     @Override
     public void start(Stage primaryStage) {
 
@@ -32,6 +34,8 @@ public class Vis03 extends Application {
 
         assert cars != null;
         assert logos != null;
+
+        averageCar = new Car();
 
 
         ImageView imageView = new ImageView();
@@ -54,7 +58,7 @@ public class Vis03 extends Application {
         ColorAdjust colorAdjust = new ColorAdjust();
         //Setting the saturation value
         colorAdjust.setSaturation(-1);
-        //Applying coloradjust effect to the ImageView node
+        //Applying color adjust effect to the ImageView node
         imageView.setEffect(colorAdjust);
 
         imageView.setOnMouseClicked(e -> {
@@ -104,8 +108,6 @@ public class Vis03 extends Application {
     GridPane generateDetails(Image manufacturer, Car car, boolean metric) {
         GridPane pane = new GridPane();
         pane.setHgap(10); // set gap in pixels
-        pane.setVgap(10); // set gap in pixels
-
 
         pane.add(new Label("Name"), 0, 0, 1, 1);
         pane.add(new Label("Manufacturer"), 0, 1, 1, 1);

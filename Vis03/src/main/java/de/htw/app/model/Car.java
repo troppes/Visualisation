@@ -58,6 +58,17 @@ public class Car {
     @JsonProperty
     private String origin;
 
+    public Car(){}
+
+    public Car(Double consumption, Integer cylinder, Double displacement, Double horsepower, Double weight, Double acceleration) {
+        this.consumption = consumption;
+        this.cylinder = cylinder;
+        this.displacement = displacement;
+        this.horsepower = horsepower;
+        this.weight = weight;
+        this.acceleration = acceleration;
+    }
+
     public String getName() {
         return name;
     }
