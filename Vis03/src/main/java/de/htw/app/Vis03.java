@@ -13,6 +13,8 @@ import javafx.stage.Stage;
 
 import java.util.*;
 
+//ToDo: Some cars throw errors when clicked on. Not sure why yet
+
 public class Vis03 extends Application {
 
     //Screen item references
@@ -30,13 +32,14 @@ public class Vis03 extends Application {
 
         List<Car> cars = ConnectionManager.loadCSV("https://home.htw-berlin.de/~jungk/vis_ss21/ue03/cars.txt", Car.class, '\t');
 
-        //ToDo: Remove this block. this was for testing only, as we get null pointer exceptions from missing logos
+        //ToDo: Remove this block. this was for testing only, as we get null pointer exceptions from missing
+            /*
             List<Car> testCars = new ArrayList<>();
-            testCars.add(cars.get(0));
-            testCars.add(cars.get(1));
-            testCars.add(cars.get(37));
-
+            for(int i=0; i<39; i++) {
+                testCars.add(cars.get(i));
+            }
             cars = testCars;
+            */
 
         List<Logo> logos = ConnectionManager.loadJSON("logos/data.json", Logo.class);
 
@@ -45,50 +48,11 @@ public class Vis03 extends Application {
 
         averageCar = new Car(); // Todo build averagecar
 
-        /*
-        ImageView imageView = new ImageView();
-
-        Logo logo = logos.stream()
-                .filter(l -> l.getSlug().equals("amc"))
-                .findFirst()
-                .orElse(null);
-
-
-        assert logo != null;
-        imageView.setImage(logo.getImage());
-        imageView.setId(logo.getSlug());
-        //Setting the image view parameters
-        imageView.setX(10);
-        imageView.setY(10);
-        imageView.setFitWidth(575);
-        imageView.setPreserveRatio(true);
-
-        ColorAdjust colorAdjust = new ColorAdjust();
-        //Setting the saturation value
-        colorAdjust.setSaturation(-1);
-        //Applying color adjust effect to the ImageView node
-        imageView.setEffect(colorAdjust);
-
-        imageView.setOnMouseClicked(e -> {
-            ImageView v = (ImageView) e.getSource();
-
-
-            Car car = cars.stream()
-                    .filter(c -> c.getManufacturer().equals(v.getId()))
-                    .findFirst()
-                    .orElse(null);
-            assert car != null;
-
-            detailWindow.setTitle(car.getName());
-            detailWindow.setScene(new Scene(generateDetails(v.getImage(), car, averageCar, metric), 450, 450));
-            detailWindow.show();
-        });
-        */
 
         root = new BorderPane();
         root.setPrefSize(1280, 720);
 
-        ScatterChart scatterChart = new ScatterChart(cars, logos, 800, 500);
+        ScatterChart scatterChart = new ScatterChart(cars, logos, 1600, 800);
 
         Button unitsButton = new Button("Set units to metric");
         unitsButton.setOnAction(e -> {
@@ -110,7 +74,8 @@ public class Vis03 extends Application {
         Scene scene = new Scene(root);
         scene.getStylesheets().add("style.css");
 
-
+        primaryStage.setWidth(2100);
+        primaryStage.setHeight(1400);
         this.primaryStage = primaryStage;
 
         primaryStage.setScene(scene);

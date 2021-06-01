@@ -3043,7 +3043,7 @@
   },
   {
     "name": "Mercedes-Benz",
-    "slug": "mercedes-benz",
+    "slug": "mercedes",
     "image": {
       "source": "https://www.carlogos.org/logo/Mercedes-Benz-logo-2011-640x369.jpg",
       "thumb": "https://raw.githubusercontent.com/filippofilip95/car-logos-dataset/master/logos/thumb/mercedes-benz.png",
@@ -4551,7 +4551,7 @@
   },
   {
     "name": "Volkswagen",
-    "slug": "volkswagen",
+    "slug": "vw",
     "image": {
       "source": "https://www.carlogos.org/logo/Volkswagen-logo-2019-640x500.jpg",
       "thumb": "https://raw.githubusercontent.com/filippofilip95/car-logos-dataset/master/logos/thumb/volkswagen.png",
@@ -4859,6 +4859,32 @@
       "localThumb": "logos/thumb/zinoro.png",
       "localOptimized": "logos/optimized/zinoro.png",
       "localOriginal": "logos/original/zinoro.png"
+    }
+  },
+  {
+    "name": "Capri",
+    "slug": "capri",
+    "image": {
+      "source": "",
+      "thumb": "",
+      "optimized": "",
+      "original": "",
+      "localThumb": "logos/thumb/capri.png",
+      "localOptimized": "logos/optimized/capri.png",
+      "localOriginal": "logos/original/capri.png"
+    }
+  },
+  {
+    "name": "Hi",
+    "slug": "hi",
+    "image": {
+      "source": "",
+      "thumb": "",
+      "optimized": "",
+      "original": "",
+      "localThumb": "logos/thumb/hi.jpg",
+      "localOptimized": "logos/optimized/hi.jpg",
+      "localOriginal": "logos/original/hi.jpg"
     }
   }
 ]

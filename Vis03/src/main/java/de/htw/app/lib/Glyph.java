@@ -23,6 +23,8 @@ public class Glyph {
                 .filter(l -> l.getSlug().equals(car.getManufacturer()))
                 .findFirst()
                 .orElse(null);
+
+        if(logo==null) System.out.println("Manufacturer Logo missing: " + car.getManufacturer());
     }
 
     public void setPosition(double x, double y){

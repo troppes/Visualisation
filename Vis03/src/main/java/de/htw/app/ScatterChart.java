@@ -51,6 +51,7 @@ public class ScatterChart {
     ComboBox yAxisDropdown;
 
     ArrayList<Glyph> allGlyphs = new ArrayList<>();
+    ArrayList<Glyph> allGlyphsWithoutValue;
 
     Map<String, ArrayList<Glyph>> americanGlyphs = new HashMap<>();
     Map<String, ArrayList<Glyph>> europeanGlyphs = new HashMap<>();
@@ -142,6 +143,7 @@ public class ScatterChart {
     //Change string to the enum Flo created in car
     void generateGlyphCoordinates(String yAxisValue){
         scatterChartPane.getChildren().clear();
+        allGlyphsWithoutValue = new ArrayList<>();
 
         double maxYValue = 0;
         double minYValue = 0;
@@ -155,26 +157,38 @@ public class ScatterChart {
                 case "Horsepower":
                     if(glyph.getCar().getHorsepower() != null)
                         yValueToCompare = glyph.getCar().getHorsepower();
+                    else
+                        allGlyphsWithoutValue.add(glyph);
                     break;
                 case "Km/l":
                     if(glyph.getCar().getConsumption(true) != null)
                         yValueToCompare = glyph.getCar().getConsumption(metric);
+                    else
+                        allGlyphsWithoutValue.add(glyph);
                     break;
                 case "Cylinders":
                     if(glyph.getCar().getCylinder() != null)
                         yValueToCompare = glyph.getCar().getCylinder();
+                    else
+                        allGlyphsWithoutValue.add(glyph);
                     break;
                 case "Displacement":
                     if(glyph.getCar().getDisplacement(true) != null)
                         yValueToCompare = glyph.getCar().getDisplacement(metric);
+                    else
+                        allGlyphsWithoutValue.add(glyph);
                     break;
                 case "Weight":
                     if(glyph.getCar().getWeight(true) != null)
                         yValueToCompare = glyph.getCar().getWeight(metric);
+                    else
+                        allGlyphsWithoutValue.add(glyph);
                     break;
                 case "Acceleration":
                     if(glyph.getCar().getAcceleration() != null)
                         yValueToCompare = glyph.getCar().getAcceleration();
+                    else
+                        allGlyphsWithoutValue.add(glyph);
                     break;
             }
 
@@ -229,8 +243,6 @@ public class ScatterChart {
                     break;
             }
 
-            System.out.println("Manu: " + glyph.getCar().getManufacturer() + " Displacement: " + glyph.getCar().getDisplacement(metric) + " y: " + y);
-
             //https://stats.stackexchange.com/questions/281162/scale-a-number-between-a-range
             x=(x-minXValue)/(maxXValue-minXValue)*(width-0)+0;
             if(y>=0) y=(y-minYValue)/(maxYValue-minYValue)*(height-0)+0;   //if y is not null   //ToDo: Reverse y here, as picture is drawn top left to bottom right
@@ -253,36 +265,36 @@ public class ScatterChart {
         xAxis.setX(0);
         xAxis.setY(height);
 
-        //ToDo: set markers for values in regular distance for each axis
+        int numOfTags = 14;
         //x Axis
-        for(int i=0; i<=8; i++){
-            double xTag = minX + i*(maxX-minX)/8;
+        for(int i=0; i<=numOfTags; i++){
+            double xTag = minX + i*(maxX-minX)/numOfTags;
 
-            Text t = new Text(i*width/8, height+20, String.valueOf((int)xTag));
+            Text t = new Text(i*width/numOfTags, height+20, String.valueOf((int)xTag));
             t.setWrappingWidth(15);
             t.setTextAlignment(TextAlignment.CENTER);
-            t.setX(i*width/8-t.getWrappingWidth()/2);
+            t.setX(i*width/numOfTags-t.getWrappingWidth()/2);
 
             Rectangle marker = new Rectangle(2, 7);
-            marker.setX(i*width/8);
+            marker.setX(i*width/numOfTags);
             marker.setY(height);
             scatterChartPane.getChildren().add(t);
             scatterChartPane.getChildren().add(marker);
         }
 
         //y Axis
-        for(int i=0; i<=8; i++){
-            double yTag = minY + i*(maxY-minY)/8;
+        for(int i=0; i<=numOfTags; i++){
+            double yTag = minY + i*(maxY-minY)/numOfTags;
 
             Text t = new Text(String.valueOf((int)yTag));
             //t.setWrappingWidth(15);
             t.setTextAlignment(TextAlignment.CENTER);
             t.setX(-35);
-            t.setY(height - i*height/8 + 5/*-t.getWrappingHeight()/2*/);  //ToDo: Find a way to get height of these tags
+            t.setY(height - i*height/numOfTags + 5/*-t.getWrappingHeight()/2*/);  //ToDo: Find a way to get height of these tags
 
             Rectangle marker = new Rectangle(7, 2);
             marker.setX(-7);
-            marker.setY(i*height/8);
+            marker.setY(i*height/numOfTags);
             scatterChartPane.getChildren().add(t);
             scatterChartPane.getChildren().add(marker);
         }
@@ -294,7 +306,7 @@ public class ScatterChart {
     void drawGlyphs(){
         for (Map.Entry<String,ArrayList<Glyph>> entry : americanGlyphs.entrySet()){
             for (Glyph glyph : entry.getValue()) {
-                if(glyph.getVisible()){
+                if(glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)){
                     ImageView imageView = addGlyphImageView(glyph);
 
                     scatterChartPane.getChildren().add(imageView);
@@ -303,7 +315,7 @@ public class ScatterChart {
         }
         for (Map.Entry<String,ArrayList<Glyph>> entry : europeanGlyphs.entrySet()){
             for (Glyph glyph : entry.getValue()) {
-                if(glyph.getVisible()){
+                if(glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)){
                     ImageView imageView = addGlyphImageView(glyph);
 
                     scatterChartPane.getChildren().add(imageView);
@@ -312,7 +324,7 @@ public class ScatterChart {
         }
         for (Map.Entry<String,ArrayList<Glyph>> entry : japaneseGlyphs.entrySet()){
             for (Glyph glyph : entry.getValue()) {
-                if(glyph.getVisible()){
+                if(glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)){
                     ImageView imageView = addGlyphImageView(glyph);
 
                     scatterChartPane.getChildren().add(imageView);
