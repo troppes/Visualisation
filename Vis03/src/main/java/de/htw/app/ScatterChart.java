@@ -402,13 +402,13 @@ public class ScatterChart {
 
         pane.add(new Label(car.getName()), 1, 0, 1, 1);
         pane.add(new Label(car.getManufacturer()), 1, 1, 1, 1);
-        pane.add(new Label(car.getConsumption(metric).toString()), 1, 2, 1, 1);
-        pane.add(new Label(car.getCylinder().toString()), 1, 3, 1, 1);
-        pane.add(new Label(car.getDisplacement(metric).toString()), 1, 4, 1, 1);
-        pane.add(new Label(car.getHorsepower().toString()), 1, 5, 1, 1);
-        pane.add(new Label(car.getWeight(metric).toString()), 1, 6, 1, 1);
-        pane.add(new Label(car.getAcceleration().toString()), 1, 7, 1, 1);
-        pane.add(new Label(car.getYear().toString()), 1, 8, 1, 1);
+        pane.add(new Label(car.getConsumption(metric) == null ? "not available" : car.getConsumption(metric).toString()), 1, 2, 1, 1);
+        pane.add(new Label(car.getCylinder() == null ? "not available" : car.getCylinder().toString()), 1, 3, 1, 1);
+        pane.add(new Label(car.getDisplacement(metric) == null ? "not available" : car.getDisplacement(metric).toString()), 1, 4, 1, 1);
+        pane.add(new Label(car.getHorsepower() == null ? "not available" : car.getHorsepower().toString()), 1, 5, 1, 1);
+        pane.add(new Label(car.getWeight(metric) == null ? "not available" : car.getWeight(metric).toString()), 1, 6, 1, 1);
+        pane.add(new Label(car.getAcceleration() == null ? "not available" : car.getAcceleration().toString()), 1, 7, 1, 1);
+        pane.add(new Label(car.getYear() == null ? "not available" : car.getYear().toString()), 1, 8, 1, 1);
         pane.add(new Label(car.getOrigin()), 1, 9, 1, 1);
 
 
