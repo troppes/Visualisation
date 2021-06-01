@@ -70,7 +70,7 @@ public class ScatterChart {
                         "Horsepower",
                         "Km/l",
                         "Cylinders",
-                        "Displacement (CCM)",
+                        "Displacement",
                         "Weight",
                         "Acceleration"
                 );
@@ -225,6 +225,8 @@ public class ScatterChart {
                         y = glyph.getCar().getAcceleration();
                     break;
             }
+
+            System.out.println("Manu: " + glyph.getCar().getManufacturer() + " Displacement: " + glyph.getCar().getDisplacement(true) + " y: " + y);
 
             //https://stats.stackexchange.com/questions/281162/scale-a-number-between-a-range
             x=(x-minXValue)/(maxXValue-minXValue)*(width-0)+0;
