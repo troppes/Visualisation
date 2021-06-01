@@ -44,9 +44,11 @@ public class ScatterChart {
     List<Logo> logos;
 
     int width, height;
+    boolean metric;
 
     BorderPane wholeWindow;
     Pane scatterChartPane;
+    ComboBox yAxisDropdown;
 
     ArrayList<Glyph> allGlyphs = new ArrayList<>();
 
@@ -74,7 +76,8 @@ public class ScatterChart {
                         "Weight",
                         "Acceleration"
                 );
-        final ComboBox yAxisDropdown = new ComboBox(yAxisOptions);
+        yAxisDropdown = new ComboBox(yAxisOptions);
+        yAxisDropdown.setValue("Horsepower");
 
         yAxisDropdown.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
                 generateGlyphCoordinates(newValue.toString());
@@ -91,7 +94,7 @@ public class ScatterChart {
         scatterChartPane.setPadding(new Insets(50));
         //ToDo: Add Box with all selectable logos
 
-        generateGlyphCoordinates("Horsepower");
+        generateGlyphCoordinates(yAxisDropdown.getValue().toString());
     }
 
     public Pane getPane() {
@@ -155,7 +158,7 @@ public class ScatterChart {
                     break;
                 case "Km/l":
                     if(glyph.getCar().getConsumption(true) != null)
-                        yValueToCompare = glyph.getCar().getConsumption(true);
+                        yValueToCompare = glyph.getCar().getConsumption(metric);
                     break;
                 case "Cylinders":
                     if(glyph.getCar().getCylinder() != null)
@@ -163,11 +166,11 @@ public class ScatterChart {
                     break;
                 case "Displacement":
                     if(glyph.getCar().getDisplacement(true) != null)
-                        yValueToCompare = glyph.getCar().getDisplacement(true);
+                        yValueToCompare = glyph.getCar().getDisplacement(metric);
                     break;
                 case "Weight":
                     if(glyph.getCar().getWeight(true) != null)
-                        yValueToCompare = glyph.getCar().getWeight(true);
+                        yValueToCompare = glyph.getCar().getWeight(metric);
                     break;
                 case "Acceleration":
                     if(glyph.getCar().getAcceleration() != null)
@@ -206,7 +209,7 @@ public class ScatterChart {
                     break;
                 case "Km/l":
                     if(glyph.getCar().getConsumption(true) != null)
-                        y = glyph.getCar().getConsumption(true);
+                        y = glyph.getCar().getConsumption(metric);
                     break;
                 case "Cylinders":
                     if(glyph.getCar().getCylinder() != null)
@@ -214,11 +217,11 @@ public class ScatterChart {
                     break;
                 case "Displacement":
                     if(glyph.getCar().getDisplacement(true) != null)
-                        y = glyph.getCar().getDisplacement(true);
+                        y = glyph.getCar().getDisplacement(metric);
                     break;
                 case "Weight":
                     if(glyph.getCar().getWeight(true) != null)
-                        y = glyph.getCar().getWeight(true);
+                        y = glyph.getCar().getWeight(metric);
                     break;
                 case "Acceleration":
                     if(glyph.getCar().getAcceleration() != null)
@@ -226,7 +229,7 @@ public class ScatterChart {
                     break;
             }
 
-            System.out.println("Manu: " + glyph.getCar().getManufacturer() + " Displacement: " + glyph.getCar().getDisplacement(true) + " y: " + y);
+            System.out.println("Manu: " + glyph.getCar().getManufacturer() + " Displacement: " + glyph.getCar().getDisplacement(metric) + " y: " + y);
 
             //https://stats.stackexchange.com/questions/281162/scale-a-number-between-a-range
             x=(x-minXValue)/(maxXValue-minXValue)*(width-0)+0;
@@ -344,7 +347,7 @@ public class ScatterChart {
             Car car = glyph.getCar();
 
             detailWindow.setTitle(car.getName());
-            detailWindow.setScene(new Scene(generateDetails(v.getImage(), car, true), 450, 450));
+            detailWindow.setScene(new Scene(generateDetails(v.getImage(), car), 450, 450));
             detailWindow.show();
         });
 
@@ -368,7 +371,7 @@ public class ScatterChart {
     }
 
 
-    GridPane generateDetails(Image manufacturer, Car car, boolean metric) {
+    GridPane generateDetails(Image manufacturer, Car car) {
         GridPane pane = new GridPane();
         pane.setHgap(10); // set gap in pixels
         pane.setVgap(10); // set gap in pixels
@@ -422,6 +425,11 @@ public class ScatterChart {
         pane.add(imageView, 8, 0, 1, 9);
 
         return pane;
+    }
+
+    public void changedMetric(boolean metric){
+        this.metric = metric;
+        generateGlyphCoordinates(yAxisDropdown.getValue().toString());
     }
 
 }

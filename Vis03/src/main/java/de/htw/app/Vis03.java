@@ -88,6 +88,8 @@ public class Vis03 extends Application {
         root = new BorderPane();
         root.setPrefSize(1280, 720);
 
+        ScatterChart scatterChart = new ScatterChart(cars, logos, 800, 500);
+
         Button unitsButton = new Button("Set units to metric");
         unitsButton.setOnAction(e -> {
             if(metric){
@@ -97,10 +99,10 @@ public class Vis03 extends Application {
                 unitsButton.setText("Set units to american");
                 metric = true;
             }
+            scatterChart.changedMetric(metric);
         });
 
         //root.setTop(imageView);
-        ScatterChart scatterChart = new ScatterChart(cars, logos, 800, 500);
 
         root.setTop(scatterChart.getPane());
         root.setBottom(unitsButton);
