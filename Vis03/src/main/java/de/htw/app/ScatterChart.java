@@ -2,35 +2,23 @@ package de.htw.app;
 
 import de.htw.app.lib.Glyph;
 import de.htw.app.model.Logo;
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
-import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.*;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
 import de.htw.app.model.Car;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,9 +45,12 @@ public class ScatterChart {
     Map<String, ArrayList<Glyph>> europeanGlyphs = new HashMap<>();
     Map<String, ArrayList<Glyph>> japaneseGlyphs = new HashMap<>();
 
+    ArrayList<Rectangle> borders = new ArrayList<>();
+
     public ScatterChart(List<Car> cars, List<Logo> logos, int width, int height){
         wholeWindow = new BorderPane();
         scatterChartPane = new Pane();
+
         this.width = width;
         this.height = height;
         this.cars = cars;
@@ -88,8 +79,11 @@ public class ScatterChart {
         hbox.getChildren().add(yAxisDropdown);
         hbox.setPadding(new Insets(0, 50, 0, 0));
 
+        SelectionChart selectionChart = new SelectionChart(this, americanGlyphs, europeanGlyphs, japaneseGlyphs, width);
+
         wholeWindow.setLeft(hbox);
         wholeWindow.setCenter(scatterChartPane);
+        wholeWindow.setBottom(selectionChart.getSelectionPane());
 
         wholeWindow.setPadding(new Insets(20));
         scatterChartPane.setPadding(new Insets(50));
@@ -144,6 +138,7 @@ public class ScatterChart {
     void generateGlyphCoordinates(String yAxisValue){
         scatterChartPane.getChildren().clear();
         allGlyphsWithoutValue = new ArrayList<>();
+        borders = new ArrayList<>();
 
         double maxYValue = 0;
         double minYValue = 0;
@@ -252,11 +247,11 @@ public class ScatterChart {
             glyph.setPosition(x, y);
         }
 
-        generateChartAxis(minXValue, maxXValue, minYValue, maxYValue);
+        generateScatterChartAxis(minXValue, maxXValue, minYValue, maxYValue);
         drawGlyphs();
     }
 
-    void generateChartAxis(double minX, double maxX, double minY, double maxY){
+    void generateScatterChartAxis(double minX, double maxX, double minY, double maxY){
         Rectangle yAxis = new Rectangle(2, height);
         yAxis.setX(0);
         yAxis.setY(0);
@@ -304,12 +299,14 @@ public class ScatterChart {
     }
 
     void drawGlyphs(){
+        ArrayList<ImageView> images = new ArrayList<>();
+
         for (Map.Entry<String,ArrayList<Glyph>> entry : americanGlyphs.entrySet()){
             for (Glyph glyph : entry.getValue()) {
                 if(glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)){
                     ImageView imageView = addGlyphImageView(glyph);
 
-                    scatterChartPane.getChildren().add(imageView);
+                    images.add(imageView);
                 }
             }
         }
@@ -318,7 +315,7 @@ public class ScatterChart {
                 if(glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)){
                     ImageView imageView = addGlyphImageView(glyph);
 
-                    scatterChartPane.getChildren().add(imageView);
+                    images.add(imageView);
                 }
             }
         }
@@ -327,10 +324,13 @@ public class ScatterChart {
                 if(glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)){
                     ImageView imageView = addGlyphImageView(glyph);
 
-                    scatterChartPane.getChildren().add(imageView);
+                    images.add(imageView);
                 }
             }
         }
+
+        scatterChartPane.getChildren().addAll(borders);
+        scatterChartPane.getChildren().addAll(images);
     }
 
     ImageView addGlyphImageView(Glyph glyph){
@@ -353,6 +353,17 @@ public class ScatterChart {
         //Applying coloradjust effect to the ImageView node
         imageView.setEffect(colorAdjust);
 
+        //Adding image view border
+        Rectangle rect = new Rectangle();
+
+        if(glyph.getCar().getOrigin().equals("American")) rect = new Rectangle(imageView.boundsInParentProperty().get().getWidth()+4, imageView.boundsInParentProperty().get().getHeight()+4, Color.RED);
+        else if(glyph.getCar().getOrigin().equals("European")) rect = new Rectangle(imageView.boundsInParentProperty().get().getWidth()+4, imageView.boundsInParentProperty().get().getHeight()+4, Color.BLUE);
+        else if(glyph.getCar().getOrigin().equals("Japanese")) rect = new Rectangle(imageView.boundsInParentProperty().get().getWidth()+4, imageView.boundsInParentProperty().get().getHeight()+4, Color.GREEN);
+
+        rect.setX(imageView.getX()-2);
+        rect.setY(imageView.getY()-2);
+        borders.add(rect);
+
         imageView.setOnMouseClicked(e -> {
             ImageView v = (ImageView) e.getSource();
 
@@ -367,19 +378,51 @@ public class ScatterChart {
     }
 
     //call this on click on a whole region
-    void changeGlyphVisibilty(Map<String, ArrayList<Glyph>> origin, boolean visibility){
-        for (Map.Entry<String,ArrayList<Glyph>> entry : origin.entrySet()){
-            for (Glyph glyph : entry.getValue()) {
-                glyph.setVisible(visibility);
+    void changeGlyphVisibiltyOrigin(String origin, boolean visibility){
+        if(origin.equals("American")) {
+            for (Map.Entry<String, ArrayList<Glyph>> entry : americanGlyphs.entrySet()) {
+                for (Glyph glyph : entry.getValue()) {
+                    glyph.setVisible(visibility);
+                }
             }
         }
+        else if(origin.equals("European")) {
+            for (Map.Entry<String, ArrayList<Glyph>> entry : europeanGlyphs.entrySet()) {
+                for (Glyph glyph : entry.getValue()) {
+                    glyph.setVisible(visibility);
+                }
+            }
+        }
+        else if(origin.equals("Japanese")) {
+            for (Map.Entry<String, ArrayList<Glyph>> entry : japaneseGlyphs.entrySet()) {
+                for (Glyph glyph : entry.getValue()) {
+                    glyph.setVisible(visibility);
+                }
+            }
+        }
+
+        generateGlyphCoordinates(yAxisDropdown.getValue().toString());
     }
 
     //call this on click on a Manufacturer Logo
-    void changeGlyphVisibilty(ArrayList<Glyph> manufacturer, boolean visibility){
-        for (Glyph glyph : manufacturer) {
-            glyph.setVisible(visibility);
+    void changeGlyphVisibiltyManufacturer(String manufacturer, boolean visibility){
+        for (Map.Entry<String, ArrayList<Glyph>> entry : americanGlyphs.entrySet()) {
+            for (Glyph glyph : entry.getValue()) {
+                if(glyph.getCar().getManufacturer().equals(manufacturer)) glyph.setVisible(visibility);
+            }
         }
+        for (Map.Entry<String, ArrayList<Glyph>> entry : europeanGlyphs.entrySet()) {
+            for (Glyph glyph : entry.getValue()) {
+                if(glyph.getCar().getManufacturer().equals(manufacturer)) glyph.setVisible(visibility);
+            }
+        }
+        for (Map.Entry<String, ArrayList<Glyph>> entry : japaneseGlyphs.entrySet()) {
+            for (Glyph glyph : entry.getValue()) {
+                if(glyph.getCar().getManufacturer().equals(manufacturer)) glyph.setVisible(visibility);
+            }
+        }
+
+        generateGlyphCoordinates(yAxisDropdown.getValue().toString());
     }
 
 
