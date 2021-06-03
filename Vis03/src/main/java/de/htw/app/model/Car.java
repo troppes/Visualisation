@@ -23,7 +23,7 @@ import de.htw.app.lib.deserializer.DoubleDeserializer;
 public class Car {
 
 
-    public enum comparableValues {
+    public enum ComparableValues {
         Consumption,
         Cylinder,
         Displacement,
@@ -113,6 +113,14 @@ public class Car {
 
     public String getOrigin() {
         return origin;
+    }
+
+    public static ComparableValues asEnum(String str) {
+        for (ComparableValues me : ComparableValues.values()) {
+            if (me.name().equalsIgnoreCase(str))
+                return me;
+        }
+        return ComparableValues.Horsepower;
     }
 
     @Override

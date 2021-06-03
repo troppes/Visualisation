@@ -31,12 +31,14 @@ public class ScatterChart {
     List<Car> cars;
     List<Logo> logos;
 
+    Car averageCar;
+
     int width, height;
     boolean metric;
 
     BorderPane wholeWindow;
     Pane scatterChartPane;
-    ComboBox yAxisDropdown;
+    ComboBox<String> yAxisDropdown;
 
     ArrayList<Glyph> allGlyphs = new ArrayList<>();
     ArrayList<Glyph> allGlyphsWithoutValue;
@@ -47,7 +49,7 @@ public class ScatterChart {
 
     ArrayList<Rectangle> borders = new ArrayList<>();
 
-    public ScatterChart(List<Car> cars, List<Logo> logos, int width, int height){
+    public ScatterChart(List<Car> cars, List<Logo> logos, int width, int height) {
         wholeWindow = new BorderPane();
         scatterChartPane = new Pane();
 
@@ -55,6 +57,9 @@ public class ScatterChart {
         this.height = height;
         this.cars = cars;
         this.logos = logos;
+
+        //Caclulate averageCar
+        generateAverageCar();
 
         generateGlyphOriginPairs();
 
@@ -68,12 +73,12 @@ public class ScatterChart {
                         "Weight",
                         "Acceleration"
                 );
-        yAxisDropdown = new ComboBox(yAxisOptions);
+        yAxisDropdown = new ComboBox<>(yAxisOptions);
         yAxisDropdown.setValue("Horsepower");
 
-        yAxisDropdown.getSelectionModel().selectedItemProperty().addListener( (options, oldValue, newValue) -> {
-                generateGlyphCoordinates(newValue.toString());
-            }
+        yAxisDropdown.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
+                    generateGlyphCoordinates(newValue);
+                }
         );
         HBox hbox = new HBox();
         hbox.getChildren().add(yAxisDropdown);
@@ -89,45 +94,92 @@ public class ScatterChart {
         scatterChartPane.setPadding(new Insets(50));
         //ToDo: Add Box with all selectable logos
 
+
         generateGlyphCoordinates(yAxisDropdown.getValue().toString());
+    }
+
+    private void generateAverageCar() {
+
+        double consumption = 0;
+        int consumptionC = 0;
+        int cylinder = 0;
+        int cylinderC = 0;
+        double displacement = 0;
+        int displacementC = 0;
+        double horsepower = 0;
+        int horsepowerC = 0;
+        double weight = 0;
+        int weightC = 0;
+        double acceleration = 0;
+        int accelerationC = 0;
+
+        for (Car car : cars) {
+            if (car.getConsumption(false) != null) {
+                consumption += car.getConsumption(false);
+                consumptionC++;
+            }
+            if (car.getCylinder() != null){
+                cylinder += car.getCylinder();
+                cylinderC++;
+            }
+            if (car.getDisplacement(false) != null){
+                displacement += car.getDisplacement(false);
+                displacementC++;
+            }
+            if (car.getHorsepower() != null){
+                horsepower += car.getHorsepower();
+                horsepowerC++;
+            }
+            if (car.getWeight(false) != null){
+                weight += car.getWeight(false);
+                weightC++;
+            }
+            if (car.getAcceleration() != null){
+                acceleration += car.getAcceleration();
+                accelerationC++;
+            }
+        }
+        consumption = (double) Math.round(consumption/consumptionC * 100) / 100;
+        cylinder = cylinder/cylinderC;
+        displacement = (double) Math.round(displacement/displacementC * 100) / 100;
+        horsepower = (double) Math.round(horsepower/horsepowerC * 100) / 100;
+        weight = (double) Math.round(weight/weightC * 100) / 100;
+        acceleration = (double) Math.round(acceleration/accelerationC * 100) / 100;
+
+        averageCar = new Car(consumption, cylinder, displacement, horsepower, weight, acceleration);
     }
 
     public Pane getPane() {
         return wholeWindow;
     }
 
-    void generateGlyphOriginPairs(){
-        for(Car car : cars){
+    void generateGlyphOriginPairs() {
+        for (Car car : cars) {
             Glyph glyph = new Glyph(car, logos);
             allGlyphs.add(glyph);
 
-            if(car.getOrigin().equals("American")){
-                if(!americanGlyphs.containsKey(car.getManufacturer())){
+            if (car.getOrigin().equals("American")) {
+                if (!americanGlyphs.containsKey(car.getManufacturer())) {
                     ArrayList<Glyph> list = new ArrayList<>();
                     list.add(glyph);
                     americanGlyphs.put(car.getManufacturer(), list);
-                }
-                else{
+                } else {
                     americanGlyphs.get(car.getManufacturer()).add(glyph);
                 }
-            }
-            else if(car.getOrigin().equals("European")){
-                if(!europeanGlyphs.containsKey(car.getManufacturer())){
+            } else if (car.getOrigin().equals("European")) {
+                if (!europeanGlyphs.containsKey(car.getManufacturer())) {
                     ArrayList<Glyph> list = new ArrayList<>();
                     list.add(glyph);
                     europeanGlyphs.put(car.getManufacturer(), list);
-                }
-                else{
+                } else {
                     europeanGlyphs.get(car.getManufacturer()).add(glyph);
                 }
-            }
-            else{
-                if(!japaneseGlyphs.containsKey(car.getManufacturer())){
+            } else {
+                if (!japaneseGlyphs.containsKey(car.getManufacturer())) {
                     ArrayList<Glyph> list = new ArrayList<>();
                     list.add(glyph);
                     japaneseGlyphs.put(car.getManufacturer(), list);
-                }
-                else{
+                } else {
                     japaneseGlyphs.get(car.getManufacturer()).add(glyph);
                 }
             }
@@ -135,7 +187,7 @@ public class ScatterChart {
     }
 
     //Change string to the enum Flo created in car
-    void generateGlyphCoordinates(String yAxisValue){
+    void generateGlyphCoordinates(String yAxisValue) {
         scatterChartPane.getChildren().clear();
         allGlyphsWithoutValue = new ArrayList<>();
         borders = new ArrayList<>();
@@ -144,104 +196,103 @@ public class ScatterChart {
         double minYValue = 0;
         double maxXValue = 0;
         double minXValue = 70;
-        for(Glyph glyph : allGlyphs){
+        for (Glyph glyph : allGlyphs) {
             double yValueToCompare = -1;
             double xValueToCompare = glyph.getCar().getYear();
 
-            switch (yAxisValue){
+            switch (yAxisValue) {
                 case "Horsepower":
-                    if(glyph.getCar().getHorsepower() != null)
+                    if (glyph.getCar().getHorsepower() != null)
                         yValueToCompare = glyph.getCar().getHorsepower();
                     else
                         allGlyphsWithoutValue.add(glyph);
                     break;
                 case "Km/l":
-                    if(glyph.getCar().getConsumption(true) != null)
+                    if (glyph.getCar().getConsumption(true) != null)
                         yValueToCompare = glyph.getCar().getConsumption(metric);
                     else
                         allGlyphsWithoutValue.add(glyph);
                     break;
                 case "Cylinders":
-                    if(glyph.getCar().getCylinder() != null)
+                    if (glyph.getCar().getCylinder() != null)
                         yValueToCompare = glyph.getCar().getCylinder();
                     else
                         allGlyphsWithoutValue.add(glyph);
                     break;
                 case "Displacement":
-                    if(glyph.getCar().getDisplacement(true) != null)
+                    if (glyph.getCar().getDisplacement(true) != null)
                         yValueToCompare = glyph.getCar().getDisplacement(metric);
                     else
                         allGlyphsWithoutValue.add(glyph);
                     break;
                 case "Weight":
-                    if(glyph.getCar().getWeight(true) != null)
+                    if (glyph.getCar().getWeight(true) != null)
                         yValueToCompare = glyph.getCar().getWeight(metric);
                     else
                         allGlyphsWithoutValue.add(glyph);
                     break;
                 case "Acceleration":
-                    if(glyph.getCar().getAcceleration() != null)
+                    if (glyph.getCar().getAcceleration() != null)
                         yValueToCompare = glyph.getCar().getAcceleration();
                     else
                         allGlyphsWithoutValue.add(glyph);
                     break;
             }
 
-            if(yValueToCompare != -1 && yValueToCompare > maxYValue){   //if y is not null
+            if (yValueToCompare != -1 && yValueToCompare > maxYValue) {   //if y is not null
                 maxYValue = yValueToCompare;
-            }
-            else if(yValueToCompare != -1 && yValueToCompare < minYValue){
+            } else if (yValueToCompare != -1 && yValueToCompare < minYValue) {
                 minYValue = yValueToCompare;
             }
 
-            if(xValueToCompare > maxXValue){
+            if (xValueToCompare > maxXValue) {
                 maxXValue = xValueToCompare;
-            }
-            else if(xValueToCompare < minXValue){
+            } else if (xValueToCompare < minXValue) {
                 minXValue = xValueToCompare;
             }
         }
 
         //to leave a little space to the left and right of the graph
-        maxXValue+=1;
-        minXValue-=1;
+        maxXValue += 1;
+        minXValue -= 1;
 
         //normalize and set position
-        for(Glyph glyph : allGlyphs){
+        for (Glyph glyph : allGlyphs) {
             double x = glyph.getCar().getYear();
             double y = -1;
 
-            switch (yAxisValue){
+            switch (yAxisValue) {
                 case "Horsepower":
-                    if(glyph.getCar().getHorsepower() != null)
+                    if (glyph.getCar().getHorsepower() != null)
                         y = glyph.getCar().getHorsepower();
                     break;
                 case "Km/l":
-                    if(glyph.getCar().getConsumption(true) != null)
+                    if (glyph.getCar().getConsumption(true) != null)
                         y = glyph.getCar().getConsumption(metric);
                     break;
                 case "Cylinders":
-                    if(glyph.getCar().getCylinder() != null)
+                    if (glyph.getCar().getCylinder() != null)
                         y = glyph.getCar().getCylinder();
                     break;
                 case "Displacement":
-                    if(glyph.getCar().getDisplacement(true) != null)
+                    if (glyph.getCar().getDisplacement(true) != null)
                         y = glyph.getCar().getDisplacement(metric);
                     break;
                 case "Weight":
-                    if(glyph.getCar().getWeight(true) != null)
+                    if (glyph.getCar().getWeight(true) != null)
                         y = glyph.getCar().getWeight(metric);
                     break;
                 case "Acceleration":
-                    if(glyph.getCar().getAcceleration() != null)
+                    if (glyph.getCar().getAcceleration() != null)
                         y = glyph.getCar().getAcceleration();
                     break;
             }
 
             //https://stats.stackexchange.com/questions/281162/scale-a-number-between-a-range
-            x=(x-minXValue)/(maxXValue-minXValue)*(width-0)+0;
-            if(y>=0) y=(y-minYValue)/(maxYValue-minYValue)*(height-0)+0;   //if y is not null   //ToDo: Reverse y here, as picture is drawn top left to bottom right
-            else y=-5000;   //ToDo: Placeholder. Maybe don't display it at all if that's the case
+            x = (x - minXValue) / (maxXValue - minXValue) * (width - 0) + 0;
+            if (y >= 0)
+                y = (y - minYValue) / (maxYValue - minYValue) * (height - 0) + 0;   //if y is not null   //ToDo: Reverse y here, as picture is drawn top left to bottom right
+            else y = -5000;   //ToDo: Placeholder. Maybe don't display it at all if that's the case
             y = height - y;
 
             glyph.setPosition(x, y);
@@ -251,7 +302,7 @@ public class ScatterChart {
         drawGlyphs();
     }
 
-    void generateScatterChartAxis(double minX, double maxX, double minY, double maxY){
+    void generateScatterChartAxis(double minX, double maxX, double minY, double maxY) {
         Rectangle yAxis = new Rectangle(2, height);
         yAxis.setX(0);
         yAxis.setY(0);
@@ -262,34 +313,34 @@ public class ScatterChart {
 
         int numOfTags = 14;
         //x Axis
-        for(int i=0; i<=numOfTags; i++){
-            double xTag = minX + i*(maxX-minX)/numOfTags;
+        for (int i = 0; i <= numOfTags; i++) {
+            double xTag = minX + i * (maxX - minX) / numOfTags;
 
-            Text t = new Text(i*width/numOfTags, height+20, String.valueOf((int)xTag));
+            Text t = new Text(i * width / numOfTags, height + 20, String.valueOf((int) xTag));
             t.setWrappingWidth(15);
             t.setTextAlignment(TextAlignment.CENTER);
-            t.setX(i*width/numOfTags-t.getWrappingWidth()/2);
+            t.setX(i * width / numOfTags - t.getWrappingWidth() / 2);
 
             Rectangle marker = new Rectangle(2, 7);
-            marker.setX(i*width/numOfTags);
+            marker.setX(i * width / numOfTags);
             marker.setY(height);
             scatterChartPane.getChildren().add(t);
             scatterChartPane.getChildren().add(marker);
         }
 
         //y Axis
-        for(int i=0; i<=numOfTags; i++){
-            double yTag = minY + i*(maxY-minY)/numOfTags;
+        for (int i = 0; i <= numOfTags; i++) {
+            double yTag = minY + i * (maxY - minY) / numOfTags;
 
-            Text t = new Text(String.valueOf((int)yTag));
+            Text t = new Text(String.valueOf((int) yTag));
             //t.setWrappingWidth(15);
             t.setTextAlignment(TextAlignment.CENTER);
             t.setX(-35);
-            t.setY(height - i*height/numOfTags + 5/*-t.getWrappingHeight()/2*/);  //ToDo: Find a way to get height of these tags
+            t.setY(height - i * height / numOfTags + 5/*-t.getWrappingHeight()/2*/);  //ToDo: Find a way to get height of these tags
 
             Rectangle marker = new Rectangle(7, 2);
             marker.setX(-7);
-            marker.setY(i*height/numOfTags);
+            marker.setY(i * height / numOfTags);
             scatterChartPane.getChildren().add(t);
             scatterChartPane.getChildren().add(marker);
         }
@@ -298,30 +349,30 @@ public class ScatterChart {
         scatterChartPane.getChildren().add(xAxis);
     }
 
-    void drawGlyphs(){
+    void drawGlyphs() {
         ArrayList<ImageView> images = new ArrayList<>();
 
-        for (Map.Entry<String,ArrayList<Glyph>> entry : americanGlyphs.entrySet()){
+        for (Map.Entry<String, ArrayList<Glyph>> entry : americanGlyphs.entrySet()) {
             for (Glyph glyph : entry.getValue()) {
-                if(glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)){
+                if (glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)) {
                     ImageView imageView = addGlyphImageView(glyph);
 
                     images.add(imageView);
                 }
             }
         }
-        for (Map.Entry<String,ArrayList<Glyph>> entry : europeanGlyphs.entrySet()){
+        for (Map.Entry<String, ArrayList<Glyph>> entry : europeanGlyphs.entrySet()) {
             for (Glyph glyph : entry.getValue()) {
-                if(glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)){
+                if (glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)) {
                     ImageView imageView = addGlyphImageView(glyph);
 
                     images.add(imageView);
                 }
             }
         }
-        for (Map.Entry<String,ArrayList<Glyph>> entry : japaneseGlyphs.entrySet()){
+        for (Map.Entry<String, ArrayList<Glyph>> entry : japaneseGlyphs.entrySet()) {
             for (Glyph glyph : entry.getValue()) {
-                if(glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)){
+                if (glyph.getVisible() && !allGlyphsWithoutValue.contains(glyph)) {
                     ImageView imageView = addGlyphImageView(glyph);
 
                     images.add(imageView);
@@ -333,7 +384,7 @@ public class ScatterChart {
         scatterChartPane.getChildren().addAll(images);
     }
 
-    ImageView addGlyphImageView(Glyph glyph){
+    ImageView addGlyphImageView(Glyph glyph) {
         ImageView imageView = new ImageView();
 
         //Setting image to the image view
@@ -344,8 +395,8 @@ public class ScatterChart {
         //Setting the image view parameters
         imageView.setFitWidth(70);
         imageView.setPreserveRatio(true);
-        imageView.setX(glyph.getPosX() - imageView.getFitWidth()/2);
-        imageView.setY(glyph.getPosY()- imageView.getFitHeight()/2);
+        imageView.setX(glyph.getPosX() - imageView.getFitWidth() / 2);
+        imageView.setY(glyph.getPosY() - imageView.getFitHeight() / 2);
 
         ColorAdjust colorAdjust = new ColorAdjust();
         //Setting the saturation value
@@ -356,12 +407,15 @@ public class ScatterChart {
         //Adding image view border
         Rectangle rect = new Rectangle();
 
-        if(glyph.getCar().getOrigin().equals("American")) rect = new Rectangle(imageView.boundsInParentProperty().get().getWidth()+4, imageView.boundsInParentProperty().get().getHeight()+4, Color.RED);
-        else if(glyph.getCar().getOrigin().equals("European")) rect = new Rectangle(imageView.boundsInParentProperty().get().getWidth()+4, imageView.boundsInParentProperty().get().getHeight()+4, Color.BLUE);
-        else if(glyph.getCar().getOrigin().equals("Japanese")) rect = new Rectangle(imageView.boundsInParentProperty().get().getWidth()+4, imageView.boundsInParentProperty().get().getHeight()+4, Color.GREEN);
+        if (glyph.getCar().getOrigin().equals("American"))
+            rect = new Rectangle(imageView.boundsInParentProperty().get().getWidth() + 4, imageView.boundsInParentProperty().get().getHeight() + 4, Color.RED);
+        else if (glyph.getCar().getOrigin().equals("European"))
+            rect = new Rectangle(imageView.boundsInParentProperty().get().getWidth() + 4, imageView.boundsInParentProperty().get().getHeight() + 4, Color.BLUE);
+        else if (glyph.getCar().getOrigin().equals("Japanese"))
+            rect = new Rectangle(imageView.boundsInParentProperty().get().getWidth() + 4, imageView.boundsInParentProperty().get().getHeight() + 4, Color.GREEN);
 
-        rect.setX(imageView.getX()-2);
-        rect.setY(imageView.getY()-2);
+        rect.setX(imageView.getX() - 2);
+        rect.setY(imageView.getY() - 2);
         borders.add(rect);
 
         imageView.setOnMouseClicked(e -> {
@@ -370,7 +424,7 @@ public class ScatterChart {
             Car car = glyph.getCar();
 
             detailWindow.setTitle(car.getName());
-            detailWindow.setScene(new Scene(generateDetails(v.getImage(), car), 450, 450));
+            detailWindow.setScene(new Scene(generateDetails(v.getImage(), car, averageCar), 600, 400));
             detailWindow.show();
         });
 
@@ -378,22 +432,20 @@ public class ScatterChart {
     }
 
     //call this on click on a whole region
-    void changeGlyphVisibiltyOrigin(String origin, boolean visibility){
-        if(origin.equals("American")) {
+    void changeGlyphVisibiltyOrigin(String origin, boolean visibility) {
+        if (origin.equals("American")) {
             for (Map.Entry<String, ArrayList<Glyph>> entry : americanGlyphs.entrySet()) {
                 for (Glyph glyph : entry.getValue()) {
                     glyph.setVisible(visibility);
                 }
             }
-        }
-        else if(origin.equals("European")) {
+        } else if (origin.equals("European")) {
             for (Map.Entry<String, ArrayList<Glyph>> entry : europeanGlyphs.entrySet()) {
                 for (Glyph glyph : entry.getValue()) {
                     glyph.setVisible(visibility);
                 }
             }
-        }
-        else if(origin.equals("Japanese")) {
+        } else if (origin.equals("Japanese")) {
             for (Map.Entry<String, ArrayList<Glyph>> entry : japaneseGlyphs.entrySet()) {
                 for (Glyph glyph : entry.getValue()) {
                     glyph.setVisible(visibility);
@@ -405,20 +457,20 @@ public class ScatterChart {
     }
 
     //call this on click on a Manufacturer Logo
-    void changeGlyphVisibiltyManufacturer(String manufacturer, boolean visibility){
+    void changeGlyphVisibiltyManufacturer(String manufacturer, boolean visibility) {
         for (Map.Entry<String, ArrayList<Glyph>> entry : americanGlyphs.entrySet()) {
             for (Glyph glyph : entry.getValue()) {
-                if(glyph.getCar().getManufacturer().equals(manufacturer)) glyph.setVisible(visibility);
+                if (glyph.getCar().getManufacturer().equals(manufacturer)) glyph.setVisible(visibility);
             }
         }
         for (Map.Entry<String, ArrayList<Glyph>> entry : europeanGlyphs.entrySet()) {
             for (Glyph glyph : entry.getValue()) {
-                if(glyph.getCar().getManufacturer().equals(manufacturer)) glyph.setVisible(visibility);
+                if (glyph.getCar().getManufacturer().equals(manufacturer)) glyph.setVisible(visibility);
             }
         }
         for (Map.Entry<String, ArrayList<Glyph>> entry : japaneseGlyphs.entrySet()) {
             for (Glyph glyph : entry.getValue()) {
-                if(glyph.getCar().getManufacturer().equals(manufacturer)) glyph.setVisible(visibility);
+                if (glyph.getCar().getManufacturer().equals(manufacturer)) glyph.setVisible(visibility);
             }
         }
 
@@ -426,43 +478,43 @@ public class ScatterChart {
     }
 
 
-    GridPane generateDetails(Image manufacturer, Car car) {
+    GridPane generateDetails(Image manufacturer, Car car, Car averageCar) {
         GridPane pane = new GridPane();
         pane.setHgap(10); // set gap in pixels
         pane.setVgap(10); // set gap in pixels
 
 
-        pane.add(new Label("Name"), 0, 0, 1, 1);
-        pane.add(new Label("Manufacturer"), 0, 1, 1, 1);
-        pane.add(new Label("Consumption"), 0, 2, 1, 1);
-        pane.add(new Label("Cylinder"), 0, 3, 1, 1);
-        pane.add(new Label("Displacement"), 0, 4, 1, 1);
-        pane.add(new Label("Horsepower"), 0, 5, 1, 1);
-        pane.add(new Label("Weight"), 0, 6, 1, 1);
-        pane.add(new Label("Acceleration"), 0, 7, 1, 1);
-        pane.add(new Label("Year"), 0, 8, 1, 1);
-        pane.add(new Label("Origin"), 0, 9, 1, 1);
+        pane.add(new Label("Name"), 0, 1, 1, 1);
+        pane.add(new Label("Manufacturer"), 0, 2, 1, 1);
+        pane.add(new Label("Consumption"), 0, 3, 1, 1);
+        pane.add(new Label("Cylinder"), 0, 4, 1, 1);
+        pane.add(new Label("Displacement"), 0, 5, 1, 1);
+        pane.add(new Label("Horsepower"), 0, 6, 1, 1);
+        pane.add(new Label("Weight"), 0, 7, 1, 1);
+        pane.add(new Label("Acceleration"), 0, 8, 1, 1);
+        pane.add(new Label("Year"), 0, 9, 1, 1);
+        pane.add(new Label("Origin"), 0, 10, 1, 1);
 
-        pane.add(new Label(car.getName()), 1, 0, 1, 1);
-        pane.add(new Label(car.getManufacturer()), 1, 1, 1, 1);
-        pane.add(new Label(car.getConsumption(metric) == null ? "not available" : car.getConsumption(metric).toString()), 1, 2, 1, 1);
-        pane.add(new Label(car.getCylinder() == null ? "not available" : car.getCylinder().toString()), 1, 3, 1, 1);
-        pane.add(new Label(car.getDisplacement(metric) == null ? "not available" : car.getDisplacement(metric).toString()), 1, 4, 1, 1);
-        pane.add(new Label(car.getHorsepower() == null ? "not available" : car.getHorsepower().toString()), 1, 5, 1, 1);
-        pane.add(new Label(car.getWeight(metric) == null ? "not available" : car.getWeight(metric).toString()), 1, 6, 1, 1);
-        pane.add(new Label(car.getAcceleration() == null ? "not available" : car.getAcceleration().toString()), 1, 7, 1, 1);
-        pane.add(new Label(car.getYear() == null ? "not available" : car.getYear().toString()), 1, 8, 1, 1);
-        pane.add(new Label(car.getOrigin()), 1, 9, 1, 1);
+        pane.add(new Label(car.getName()), 1, 1, 1, 1);
+        pane.add(new Label(car.getManufacturer()), 1, 2, 1, 1);
+        pane.add(new Label(car.getConsumption(metric) == null ? "not available" : car.getConsumption(metric).toString()), 1, 3, 1, 1);
+        pane.add(new Label(car.getCylinder() == null ? "not available" : car.getCylinder().toString()), 1, 4, 1, 1);
+        pane.add(new Label(car.getDisplacement(metric) == null ? "not available" : car.getDisplacement(metric).toString()), 1, 5, 1, 1);
+        pane.add(new Label(car.getHorsepower() == null ? "not available" : car.getHorsepower().toString()), 1, 6, 1, 1);
+        pane.add(new Label(car.getWeight(metric) == null ? "not available" : car.getWeight(metric).toString()), 1, 7, 1, 1);
+        pane.add(new Label(car.getAcceleration() == null ? "not available" : car.getAcceleration().toString()), 1, 8, 1, 1);
+        pane.add(new Label(car.getYear() == null ? "not available" : car.getYear().toString()), 1, 9, 1, 1);
+        pane.add(new Label(car.getOrigin()), 1, 10, 1, 1);
 
 
         pane.add(new Label("s"), 2, 7, 1, 1);
 
-        if(metric){
+        if (metric) {
             pane.add(new Label("kmpl"), 2, 2, 1, 1);
             pane.add(new Label("ccm"), 2, 4, 1, 1);
             pane.add(new Label("ps"), 2, 5, 1, 1);
             pane.add(new Label("kg"), 2, 6, 1, 1);
-        }else{
+        } else {
             pane.add(new Label("mpg"), 2, 2, 1, 1);
             pane.add(new Label("cci"), 2, 4, 1, 1);
             pane.add(new Label("hp"), 2, 5, 1, 1);
@@ -477,14 +529,18 @@ public class ScatterChart {
         imageView.setFitWidth(100);
         imageView.setPreserveRatio(true);
 
-        pane.add(imageView, 8, 0, 1, 9);
+        pane.add(new BarChart(averageCar, car, metric), 10, 0, 1, 12);
+
+        pane.add(new Label("Logo"), 0, 0, 1, 1);
+        pane.add(imageView, 1, 0, 1, 1);
+
 
         return pane;
     }
 
-    public void changedMetric(boolean metric){
+    public void changedMetric(boolean metric) {
         this.metric = metric;
-        generateGlyphCoordinates(yAxisDropdown.getValue().toString());
+        generateGlyphCoordinates(yAxisDropdown.getValue());
     }
 
 }
