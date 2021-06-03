@@ -6,8 +6,6 @@ import de.htw.app.model.Car;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
@@ -58,8 +56,6 @@ public class Vis03 extends Application {
             }
             scatterChart.changedMetric(metric);
         });
-
-        //root.setTop(imageView);
 
         root.setTop(scatterChart.getPane());
         root.setBottom(unitsButton);

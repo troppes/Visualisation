@@ -95,7 +95,7 @@ public class ScatterChart {
         //ToDo: Add Box with all selectable logos
 
 
-        generateGlyphCoordinates(yAxisDropdown.getValue().toString());
+        generateGlyphCoordinates(yAxisDropdown.getValue());
     }
 
     private void generateAverageCar() {
@@ -453,7 +453,7 @@ public class ScatterChart {
             }
         }
 
-        generateGlyphCoordinates(yAxisDropdown.getValue().toString());
+        generateGlyphCoordinates(yAxisDropdown.getValue());
     }
 
     //call this on click on a Manufacturer Logo
