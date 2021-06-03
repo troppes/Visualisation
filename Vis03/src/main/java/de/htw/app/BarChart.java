@@ -79,7 +79,7 @@ public class BarChart extends BorderPane {
                 generateBars(averageCar.getConsumption(europeanValues), currentCar.getConsumption(europeanValues));
                 break;
             case Cylinder:
-                generateBars(new Double(averageCar.getCylinder()), new Double(currentCar.getCylinder()));
+                generateBars(Double.valueOf(averageCar.getCylinder()), Double.valueOf(currentCar.getCylinder()));
                 break;
             case Displacement:
                 generateBars(averageCar.getDisplacement(europeanValues), currentCar.getDisplacement(europeanValues));
