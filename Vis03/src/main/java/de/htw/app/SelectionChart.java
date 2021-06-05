@@ -19,8 +19,6 @@ public class SelectionChart {
     Map<String, ArrayList<Glyph>> europeanGlyphs;
     Map<String, ArrayList<Glyph>> japaneseGlyphs;
 
-    ArrayList<Rectangle> borders = new ArrayList<>();   //first store and draw all borders
-
     Pane selectionPane = new Pane();
 
     ScatterChart scatterChart;
@@ -29,65 +27,92 @@ public class SelectionChart {
 
     public SelectionChart(ScatterChart scatterChart, Map<String, ArrayList<Glyph>> americanGlyphs, Map<String, ArrayList<Glyph>> europeanGlyphs, Map<String, ArrayList<Glyph>> japaneseGlyphs, int width){
         this.scatterChart = scatterChart;
+        int imageWidth = 70;
+        int imageDistance = 75;
+        int x = imageWidth*2/3;
+        int y = 10;
+        int leftSpacing = 170;
 
         this.americanGlyphs = americanGlyphs;
         this.europeanGlyphs = europeanGlyphs;
         this.japaneseGlyphs = japaneseGlyphs;
 
-        int distanceBetweenOrigins = 20;
+        int distanceBetweenOrigins = 100;
 
         HBox completeBox = new HBox();
-        completeBox.setMaxWidth(width);
-        completeBox.setMinWidth(width);
+        completeBox.setMaxWidth(width+leftSpacing);
+        completeBox.setMinWidth(width+leftSpacing);
+        completeBox.setSpacing(distanceBetweenOrigins);
+        completeBox.setPadding(new Insets(0, 0, 0, leftSpacing));
 
         ArrayList<String> addedManufacturers = new ArrayList<>();
         Pane americanPane = generateOriginBox((width-distanceBetweenOrigins)/3, "American", Color.RED);
-        americanPane.setPadding(new Insets(5));
 
         for (Map.Entry<String,ArrayList<Glyph>> entry : americanGlyphs.entrySet()){
             for (Glyph glyph : entry.getValue()) {
                 if(!addedManufacturers.contains(glyph.getCar().getManufacturer())){
                     addedManufacturers.add(glyph.getCar().getManufacturer());
 
-                    ImageView imageView = generateGlyphImageView(glyph);
+                    if(x+imageWidth>(width-distanceBetweenOrigins)/3) {
+                        x = imageWidth*2/3;
+                        y += 75;
+                    }
 
-                    System.out.println("adding american car " + glyph.getCar().getManufacturer());
+                    ImageView imageView = generateGlyphImageView(glyph, x, y, imageWidth);
 
                     americanPane.getChildren().addAll(imageView);
+
+                    x+=imageDistance;
                 }
             }
         }
 
-        System.out.println(americanPane.getWidth());
+        x = imageWidth*2/3;
+        y = 10;
 
         addedManufacturers = new ArrayList<>();
         Pane europeanPane = generateOriginBox((width-distanceBetweenOrigins)/3, "European", Color.BLUE);
-        europeanPane.setPadding(new Insets(5));
 
         for (Map.Entry<String,ArrayList<Glyph>> entry : europeanGlyphs.entrySet()){
             for (Glyph glyph : entry.getValue()) {
                 if(!addedManufacturers.contains(glyph.getCar().getManufacturer())){
                     addedManufacturers.add(glyph.getCar().getManufacturer());
 
-                    ImageView imageView = generateGlyphImageView(glyph);
+                    if(x+imageWidth>(width-distanceBetweenOrigins)/3) {
+                        x = imageWidth*2/3;
+                        y += 75;
+                    }
+
+                    ImageView imageView = generateGlyphImageView(glyph, x, y, imageWidth);
 
                     europeanPane.getChildren().add(imageView);
+
+                    x+=imageDistance;
                 }
             }
         }
 
+        x = imageWidth*2/3;
+        y = 10;
+
         addedManufacturers = new ArrayList<>();
         Pane japanesePane = generateOriginBox((width-distanceBetweenOrigins)/3, "Japanese", Color.GREEN);
-        japanesePane.setPadding(new Insets(5));
 
         for (Map.Entry<String,ArrayList<Glyph>> entry : japaneseGlyphs.entrySet()){
             for (Glyph glyph : entry.getValue()) {
                 if(!addedManufacturers.contains(glyph.getCar().getManufacturer())){
                     addedManufacturers.add(glyph.getCar().getManufacturer());
 
-                    ImageView imageView = generateGlyphImageView(glyph);
+                    if(x+imageWidth>(width-distanceBetweenOrigins)/3) {
+                        x = imageWidth*2/3;
+                        y += 75;
+                    }
+
+                    ImageView imageView = generateGlyphImageView(glyph, x, y, imageWidth);
 
                     japanesePane.getChildren().add(imageView);
+
+                    x+=imageDistance;
                 }
             }
         }
@@ -97,7 +122,7 @@ public class SelectionChart {
         selectionPane.getChildren().addAll(completeBox);
     }
 
-    ImageView generateGlyphImageView(Glyph glyph){
+    ImageView generateGlyphImageView(Glyph glyph, int posX, int posY, int imageWidth){
 
         ImageView imageView = new ImageView();
 
@@ -107,10 +132,12 @@ public class SelectionChart {
         imageView.setImage(logo.getImage());
         imageView.setId(logo.getSlug());
         //Setting the image view parameters
-        imageView.setFitWidth(70);
+        imageView.setFitWidth(imageWidth);
         imageView.setPreserveRatio(true);
-        //imageView.setX(glyph.getPosX() - imageView.getFitWidth()/2);
-        //imageView.setY(glyph.getPosY()- imageView.getFitHeight()/2);
+        imageView.setX(posX - imageView.getFitWidth()/2);
+        imageView.setY(posY- imageView.getFitHeight()/2);
+
+        System.out.println("image X: " + imageView.getX());
 
         //ColorAdjust colorAdjust = new ColorAdjust();
         //Setting the saturation value

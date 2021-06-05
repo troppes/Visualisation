@@ -44,6 +44,7 @@ public class Vis03 extends Application {
         root.setPrefSize(1280, 720);
 
         ScatterChart scatterChart = new ScatterChart(cars, logos, 1600, 800);
+        //ScatterChart scatterChart = new ScatterChart(cars, logos, 1080, 800);
 
         Button unitsButton = new Button("Set units to metric");
         unitsButton.setOnAction(e -> {
@@ -63,8 +64,8 @@ public class Vis03 extends Application {
         Scene scene = new Scene(root);
         scene.getStylesheets().add("style.css");
 
-        primaryStage.setWidth(1280);
-        primaryStage.setHeight(720);
+        primaryStage.setWidth(2000);
+        primaryStage.setHeight(1400);
         this.primaryStage = primaryStage;
 
         primaryStage.setScene(scene);

@@ -92,7 +92,6 @@ public class ScatterChart {
 
         wholeWindow.setPadding(new Insets(20));
         scatterChartPane.setPadding(new Insets(50));
-        //ToDo: Add Box with all selectable logos
 
 
         generateGlyphCoordinates(yAxisDropdown.getValue());

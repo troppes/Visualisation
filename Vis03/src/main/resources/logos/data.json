@@ -3049,9 +3049,9 @@
       "thumb": "https://raw.githubusercontent.com/filippofilip95/car-logos-dataset/master/logos/thumb/mercedes-benz.png",
       "optimized": "https://raw.githubusercontent.com/filippofilip95/car-logos-dataset/master/logos/optimized/mercedes-benz.png",
       "original": "https://raw.githubusercontent.com/filippofilip95/car-logos-dataset/master/logos/original/mercedes-benz.jpg",
-      "localThumb": "logos/thumb/mercedes-benz.png",
-      "localOptimized": "logos/optimized/mercedes-benz.png",
-      "localOriginal": "logos/original/mercedes-benz.jpg"
+      "localThumb": "logos/thumb/mercedes.png",
+      "localOptimized": "logos/optimized/mercedes.png",
+      "localOriginal": "logos/original/mercedes.jpg"
     }
   },
   {
@@ -4557,9 +4557,9 @@
       "thumb": "https://raw.githubusercontent.com/filippofilip95/car-logos-dataset/master/logos/thumb/volkswagen.png",
       "optimized": "https://raw.githubusercontent.com/filippofilip95/car-logos-dataset/master/logos/optimized/volkswagen.png",
       "original": "https://raw.githubusercontent.com/filippofilip95/car-logos-dataset/master/logos/original/volkswagen.jpg",
-      "localThumb": "logos/thumb/volkswagen.png",
-      "localOptimized": "logos/optimized/volkswagen.png",
-      "localOriginal": "logos/original/volkswagen.jpg"
+      "localThumb": "logos/thumb/vw.png",
+      "localOptimized": "logos/optimized/vw.png",
+      "localOriginal": "logos/original/vw.jpg"
     }
   },
   {
