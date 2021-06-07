@@ -7,6 +7,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
@@ -46,7 +47,7 @@ public class SelectionChart {
         completeBox.setPadding(new Insets(0, 0, 0, leftSpacing));
 
         ArrayList<String> addedManufacturers = new ArrayList<>();
-        Pane americanPane = generateOriginBox((width-distanceBetweenOrigins)/3, "American", Color.RED);
+        Pane americanPane = generateOriginBox((width-leftSpacing)/3, "American", Color.RED);
 
         for (Map.Entry<String,ArrayList<Glyph>> entry : americanGlyphs.entrySet()){
             for (Glyph glyph : entry.getValue()) {
@@ -71,7 +72,7 @@ public class SelectionChart {
         y = 10;
 
         addedManufacturers = new ArrayList<>();
-        Pane europeanPane = generateOriginBox((width-distanceBetweenOrigins)/3, "European", Color.BLUE);
+        Pane europeanPane = generateOriginBox((width-leftSpacing)/3, "European", Color.BLUE);
 
         for (Map.Entry<String,ArrayList<Glyph>> entry : europeanGlyphs.entrySet()){
             for (Glyph glyph : entry.getValue()) {
@@ -96,7 +97,7 @@ public class SelectionChart {
         y = 10;
 
         addedManufacturers = new ArrayList<>();
-        Pane japanesePane = generateOriginBox((width-distanceBetweenOrigins)/3, "Japanese", Color.GREEN);
+        Pane japanesePane = generateOriginBox((width-leftSpacing)/3, "Japanese", Color.GREEN);
 
         for (Map.Entry<String,ArrayList<Glyph>> entry : japaneseGlyphs.entrySet()){
             for (Glyph glyph : entry.getValue()) {
@@ -156,6 +157,7 @@ public class SelectionChart {
         Pane pane = new Pane();
 
         Text t = new Text(0, 0, origin);
+        t.setFont(new Font("Arial", 20));
         t.setWrappingWidth(width);
         t.setTextAlignment(TextAlignment.CENTER);
         t.setY(-5);  //ToDo: Find a way to get height of these tags

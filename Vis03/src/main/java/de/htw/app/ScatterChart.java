@@ -13,6 +13,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
@@ -251,6 +252,28 @@ public class ScatterChart {
             }
         }
 
+        //to get some spacing to the top
+        switch (yAxisValue) {
+            case "Horsepower":
+                maxYValue += 10;
+                break;
+            case "Km/l":
+                maxYValue += 2;
+                break;
+            case "Cylinders":
+                maxYValue = 14;
+                break;
+            case "Displacement":
+                maxYValue += 20;
+                break;
+            case "Weight":
+                maxYValue += 200;
+                break;
+            case "Acceleration":
+                maxYValue += 2;
+                break;
+        }
+
         //to leave a little space to the left and right of the graph
         maxXValue += 1;
         minXValue -= 1;
@@ -327,11 +350,17 @@ public class ScatterChart {
             scatterChartPane.getChildren().add(marker);
         }
 
+        Text t = new Text(width, height + 50, "Construction year");
+        t.setX(width-50);
+        t.setFont(new Font("Arial", 15));
+
+        scatterChartPane.getChildren().add(t);
+
         //y Axis
         for (int i = 0; i <= numOfTags; i++) {
             double yTag = minY + i * (maxY - minY) / numOfTags;
 
-            Text t = new Text(String.valueOf((int) yTag));
+            t = new Text(String.valueOf((int) yTag));
             //t.setWrappingWidth(15);
             t.setTextAlignment(TextAlignment.CENTER);
             t.setX(-35);
@@ -392,8 +421,9 @@ public class ScatterChart {
         imageView.setImage(logo.getImage());
         imageView.setId(logo.getSlug());
         //Setting the image view parameters
-        imageView.setFitWidth(70);
-        imageView.setPreserveRatio(true);
+        imageView.setFitWidth(50);
+        imageView.setFitHeight(50);
+        //imageView.setPreserveRatio(true);
         imageView.setX(glyph.getPosX() - imageView.getFitWidth() / 2);
         imageView.setY(glyph.getPosY() - imageView.getFitHeight() / 2);
 
