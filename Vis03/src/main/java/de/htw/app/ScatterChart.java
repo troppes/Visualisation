@@ -417,6 +417,14 @@ public class ScatterChart {
         rect.setY(imageView.getY() - 2);
         borders.add(rect);
 
+        //making sure that pngs have a white background, too
+        rect = new Rectangle(imageView.boundsInParentProperty().get().getWidth(), imageView.boundsInParentProperty().get().getHeight(), Color.WHITE);
+
+        rect.setX(imageView.getX());
+        rect.setY(imageView.getY());
+        borders.add(rect);
+
+
         imageView.setOnMouseClicked(e -> {
             ImageView v = (ImageView) e.getSource();
 
