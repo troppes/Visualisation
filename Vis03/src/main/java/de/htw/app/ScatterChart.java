@@ -514,18 +514,18 @@ public class ScatterChart {
         pane.add(new Label(car.getOrigin()), 1, 10, 1, 1);
 
 
-        pane.add(new Label("s"), 2, 7, 1, 1);
+        pane.add(new Label("s"), 2, 8, 1, 1);
 
         if (metric) {
-            pane.add(new Label("kmpl"), 2, 2, 1, 1);
-            pane.add(new Label("ccm"), 2, 4, 1, 1);
-            pane.add(new Label("ps"), 2, 5, 1, 1);
-            pane.add(new Label("kg"), 2, 6, 1, 1);
+            pane.add(new Label("kmpl"), 2, 3, 1, 1);
+            pane.add(new Label("ccm"), 2, 5, 1, 1);
+            pane.add(new Label("ps"), 2, 6, 1, 1);
+            pane.add(new Label("kg"), 2, 7, 1, 1);
         } else {
-            pane.add(new Label("mpg"), 2, 2, 1, 1);
-            pane.add(new Label("cci"), 2, 4, 1, 1);
-            pane.add(new Label("hp"), 2, 5, 1, 1);
-            pane.add(new Label("lbs"), 2, 6, 1, 1);
+            pane.add(new Label("mpg"), 2, 3, 1, 1);
+            pane.add(new Label("cci"), 2, 5, 1, 1);
+            pane.add(new Label("hp"), 2, 6, 1, 1);
+            pane.add(new Label("lbs"), 2, 7, 1, 1);
         }
 
 
