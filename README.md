@@ -18,4 +18,4 @@ To build and run the program please use 'mvn clean javafx:run' within the projec
 
 ## Thanks
 
-A big thanks to Filip Papranec for his [car logo repo](https://github.com/filippofilip95/car-logos-dataset) which we used for Vis03.
+A big thanks to Filip Papranec for his [car logo repo](https://github.com/filippofilip95/car-logos-dataset), which we used for Vis03.
