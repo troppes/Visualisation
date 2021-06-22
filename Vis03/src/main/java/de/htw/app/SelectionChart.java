@@ -160,8 +160,7 @@ public class SelectionChart {
         t.setFont(new Font("Arial", 20));
         t.setWrappingWidth(width);
         t.setTextAlignment(TextAlignment.CENTER);
-        t.setY(-5);  //ToDo: Find a way to get height of these tags
-
+        t.setY(-5);
         t.setOnMouseClicked(e -> {
             boolean b = false;
 

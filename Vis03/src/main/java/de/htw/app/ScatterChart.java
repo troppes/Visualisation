@@ -313,8 +313,8 @@ public class ScatterChart {
             //https://stats.stackexchange.com/questions/281162/scale-a-number-between-a-range
             x = (x - minXValue) / (maxXValue - minXValue) * (width - 0) + 0;
             if (y >= 0)
-                y = (y - minYValue) / (maxYValue - minYValue) * (height - 0) + 0;   //if y is not null   //ToDo: Reverse y here, as picture is drawn top left to bottom right
-            else y = -5000;   //ToDo: Placeholder. Maybe don't display it at all if that's the case
+                y = (y - minYValue) / (maxYValue - minYValue) * (height - 0) + 0;   //if y is not null
+            else y = -5000;
             y = height - y;
 
             glyph.setPosition(x, y);
@@ -364,7 +364,7 @@ public class ScatterChart {
             //t.setWrappingWidth(15);
             t.setTextAlignment(TextAlignment.CENTER);
             t.setX(-35);
-            t.setY(height - i * height / numOfTags + 5/*-t.getWrappingHeight()/2*/);  //ToDo: Find a way to get height of these tags
+            t.setY(height - i * height / numOfTags + 5/*-t.getWrappingHeight()/2*/);
 
             Rectangle marker = new Rectangle(7, 2);
             marker.setX(-7);

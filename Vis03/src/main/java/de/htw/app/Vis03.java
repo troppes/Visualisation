@@ -11,8 +11,6 @@ import javafx.stage.Stage;
 
 import java.util.*;
 
-//ToDo: Some cars throw errors when clicked on. Not sure why yet
-
 public class Vis03 extends Application {
 
     //Screen item references
@@ -25,15 +23,6 @@ public class Vis03 extends Application {
     public void start(Stage primaryStage) {
 
         List<Car> cars = ConnectionManager.loadCSV("https://home.htw-berlin.de/~jungk/vis_ss21/ue03/cars.txt", Car.class, '\t');
-
-        //ToDo: Remove this block. this was for testing only, as we get null pointer exceptions from missing
-            /*
-            List<Car> testCars = new ArrayList<>();
-            for(int i=0; i<39; i++) {
-                testCars.add(cars.get(i));
-            }
-            cars = testCars;
-            */
 
         List<Logo> logos = ConnectionManager.loadJSON("logos/data.json", Logo.class);
 
