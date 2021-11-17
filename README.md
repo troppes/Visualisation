@@ -2,6 +2,9 @@
 by [Julian Bechthold](https://github.com/Huliandos) and [Florian Reitz](https://github.com/troppes)
 
 This repository contains our files for the visualisation module at HTW in 2021.
+All the references to the database were removed, since the server is no longer available. If you want to create your own database, here is the table structure:
+![Table structure](database/vis_github.png)
+We used [Directus](https://github.com/directus/directus) for our backend.
 
 ### Vis01 - Circle Game
 In this game the goal is to match the written size difference of the shape as closely as you can.
