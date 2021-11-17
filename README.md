@@ -4,6 +4,7 @@ by [Julian Bechthold](https://github.com/Huliandos) and [Florian Reitz](https://
 This repository contains our files for the visualisation module at HTW in 2021. For the backend we used [Directus](https://github.com/directus/directus).
 
 All the references to the database were removed, since the server is no longer available. If you want to create your own database, here is the table structure:
+
 ![Table structure](database/vis_github.png)
 
 ### Vis01 - Circle Game
