@@ -338,7 +338,7 @@ public class Vis01 extends Application {
     }
 
     void finishGame() {
-        try {
+//        try {
             if (playedShapes.size() != 0) {
                 float averageX = totalX / playedShapes.size();
 
@@ -348,19 +348,19 @@ public class Vis01 extends Application {
                 currentPlayer.setAverage_x(averageX);
                 currentPlayer.setShapes_played(gameShapes);
                 currentPlayer.setClicks(clicksOverOptimum);
-                POSTRequest(currentPlayer);
+                // POSTRequest(currentPlayer); Enable for Database
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
         generateResultScreen();
     }
 
     void generateResultScreen() {
 
-        List<GameShape> squareShapes = getSquares();
-        List<GameShape> circleShapes = getCircles();
-        List<GameObject> gameObjects = getGameObjects();
+//        List<GameShape> squareShapes = getSquares();
+//        List<GameShape> circleShapes = getCircles();
+//        List<GameObject> gameObjects = getGameObjects();
 
         BorderPane results = new BorderPane();
         results.setPrefSize(1280, 720);
@@ -379,11 +379,11 @@ public class Vis01 extends Application {
         centerContent.getChildren().add(welcomeMessage);
         results.setCenter(centerContent);
 
-        results.setLeft(generateAverageClicksBarChart(gameObjects));
-        results.setTop(generateAverageXBarChart(squareShapes, circleShapes));
-
-        results.setRight(generateHighScores(gameObjects));
-        results.setBottom(generateScatter(circleShapes, squareShapes));
+//        results.setLeft(generateAverageClicksBarChart(gameObjects));
+//        results.setTop(generateAverageXBarChart(squareShapes, circleShapes));
+//
+//        results.setRight(generateHighScores(gameObjects));
+//        results.setBottom(generateScatter(circleShapes, squareShapes));
 
         Scene scene = new Scene(results);
         primaryStage.setScene(scene);
@@ -609,7 +609,7 @@ public class Vis01 extends Application {
             e.printStackTrace();
         }
 
-        URL obj = new URL("https://cms.reitz.dev/items/shape_game/?fields=user,average_x,clicks,id");
+        URL obj = new URL("https://URL/shape_game/?fields=user,average_x,clicks,id");
         HttpURLConnection postConnection = (HttpURLConnection) obj.openConnection();
         postConnection.setRequestMethod("POST");
         postConnection.setRequestProperty("Content-Type", "application/json");
@@ -638,7 +638,7 @@ public class Vis01 extends Application {
     }
 
     private List<GameObject> getGameObjects() {
-        String response = getRequest("https://cms.reitz.dev/items/shape_game/?fields=user,average_x,clicks,id");
+        String response = getRequest("https://URL/items/shape_game/?fields=user,average_x,clicks,id");
         try {
             return Arrays.asList(new ObjectMapper().readValue(response, GameObject[].class));
         } catch (IOException e) {
@@ -648,7 +648,7 @@ public class Vis01 extends Application {
     }
 
     private List<GameShape> getSquares() {
-        String response = getRequest("https://cms.reitz.dev/items/shape_ratio/?filter[shape][_eq]=SQUARE&fields=x,ratio,shape,estimated_ratio");
+        String response = getRequest("https://URL/items/shape_ratio/?filter[shape][_eq]=SQUARE&fields=x,ratio,shape,estimated_ratio");
         try {
             return Arrays.asList(new ObjectMapper().readValue(response, GameShape[].class));
         } catch (IOException e) {
@@ -658,7 +658,7 @@ public class Vis01 extends Application {
     }
 
     private List<GameShape> getCircles() {
-        String response = getRequest("https://cms.reitz.dev/items/shape_ratio/?filter[shape][_eq]=CIRCLE&fields=x,ratio,shape,estimated_ratio");
+        String response = getRequest("https://URL/items/shape_ratio/?filter[shape][_eq]=CIRCLE&fields=x,ratio,shape,estimated_ratio");
         try {
             return Arrays.asList(new ObjectMapper().readValue(response, GameShape[].class));
         } catch (IOException e) {

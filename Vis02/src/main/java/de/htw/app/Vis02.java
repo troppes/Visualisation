@@ -308,25 +308,25 @@ public class Vis02 extends Application {
         }
         player.setMeanTime(meanTime/playedGameModes.size());
 
-        if(sendResults){
-            try {
-                player.setId(ConnectionManager.POSTRequest("https://cms.reitz.dev/items/vis02_player/", player));
-            } catch (IOException e) {
-                System.out.println("Failed to send data!");
-            }
+//        if(sendResults){
+//            try {
+//                player.setId(ConnectionManager.POSTRequest("https://URL/items/vis02_player/", player));
+//            } catch (IOException e) {
+//                System.out.println("Failed to send data!");
+//            }
+//
+//        }
 
-        }
+//        List<Player> players = ConnectionManager.GETRequest("https://URL/items/vis02_player/?fields=id,name,mean_distance,mean_time", Player.class, false);
+//        List<GameMode> gameModes = ConnectionManager.GETRequest("https://URL/items/vis02_game_mode/?fields=id,distractors,game_mode,lowest_time,mean_distance", GameMode.class, true);
 
-        List<Player> players = ConnectionManager.GETRequest("https://cms.reitz.dev/items/vis02_player/?fields=id,name,mean_distance,mean_time", Player.class, false);
-        List<GameMode> gameModes = ConnectionManager.GETRequest("https://cms.reitz.dev/items/vis02_game_mode/?fields=id,distractors,game_mode,lowest_time,mean_distance", GameMode.class, true);
-
-        assert players != null;
-        root.setRight(generatePlayerTable(players));
-
-
-        assert gameModes != null;
-        root.setTop(generateAverageTimes(gameModes));
-        root.setBottom(generateDistanceChart(gameModes));
+//        assert players != null;
+//        root.setRight(generatePlayerTable(players));
+//
+//
+//        assert gameModes != null;
+//        root.setTop(generateAverageTimes(gameModes));
+//        root.setBottom(generateDistanceChart(gameModes));
 
         Pane leftPane = new Pane();
         //leftPane.setMaxSize(300, 100);
@@ -334,7 +334,7 @@ public class Vis02 extends Application {
         final Label caption = new Label("");
         caption.getStyleClass().add("tooltip-label");
 
-        leftPane.getChildren().addAll(generateMeanPieCharts(caption, gameModes), caption);
+//        leftPane.getChildren().addAll(generateMeanPieCharts(caption, gameModes), caption);
 
         root.setLeft(leftPane);
 
